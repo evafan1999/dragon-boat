@@ -10,6 +10,7 @@ from starlette.staticfiles import StaticFiles
 import requests
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 def scrape_data():
