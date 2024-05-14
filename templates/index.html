@@ -8,21 +8,21 @@
 </head>
 <body>
     <div class="container mt-4">
-        <h1>Dragon Boat Team Attendance</h1>
-        <div class="row align-items-center">
+        <h1>派兜出席表</h1>
+        <div class="row align-items-end">
             <div class="col-12 col-md-6">
                 <label for="selectDate" class="form-label">Select Date:</label>
                 <select id="selectDate" class="form-select"></select>
             </div>
             <div class="col-12 col-md-6">
-                <button onclick="getAttendance()" class="btn btn-primary" style="margin-top: 10px;">Show Attendance</button>
+                <button onclick="getAttendance()" class="btn" style="margin-top: 10px; background-color: black; color: white;">Show Attendance</button>
             </div>
         </div>
-        <div class="container">
-            <h1>Dragon Boat Team Paddle Arrangement</h1>
+        <div class="container" style="margin-top: 10px;">
+            <!-- <h4>Paddle Arrangement</h4> -->
             <div class="row">
                 <div class="col-sm">
-                    <table class="table">
+                    <table class="table table-sm">
                         <caption class="caption-top">
                             大龍
                         </caption>
@@ -51,7 +51,7 @@
                     </table>
                 </div>    
                 <div class="col-sm">
-                    <table class="table">
+                    <table class="table table-sm">
                         <caption class="caption-top">
                             小龍
                         </caption>
@@ -79,11 +79,33 @@
         <ul id="attendanceList" class="mt-3 list-group"></ul>
     </div>
     <div class="container mt-3">
-        <button onclick="window.location.href='/members'" class="btn btn-primary">Member Management</button>
+        <button onclick="window.location.href='/members'" class="btn" style="margin-bottom: 10px; background-color: black; color: white;">Member Management</button>
     </div>
     <script>
         function getAttendance() {
             const selectDate = document.getElementById('selectDate').value;
+    
+            // Check if both paddler tables have finished loading
+            let leftTablesLoaded = true;
+            let rightTablesLoaded = true;
+    
+            for (let i = 1; i <= 12; i++) {
+                if (document.getElementById('left_' + i).options.length === 0 || document.getElementById('right_' + i).options.length === 0) {
+                    leftTablesLoaded = false;
+                    break;
+                }
+            }
+    
+            for (let i = 1; i <= 8; i++) {
+                if (document.getElementById('small_left_' + i).options.length === 0 || document.getElementById('small_right_' + i).options.length === 0) {
+                    rightTablesLoaded = false;
+                    break;
+                }
+            }
+    
+            if (leftTablesLoaded && rightTablesLoaded) {
+                alert('Loading successful!');
+            }
     
             fetch('/api/attendance')
                 .then(response => response.json())
@@ -109,131 +131,77 @@
                         .then(data => {
                             // Populate paddler options for both 大龍 and 小龍
                             for (let i = 1; i <= 12; i++) {
-                                const selectLeft = document.getElementById('left_' + i);
-                                const selectRight = document.getElementById('right_' + i);
-                                selectLeft.innerHTML = '';
-                                selectRight.innerHTML = '';
-    
-                                const emptyOption = document.createElement('option');
-                                emptyOption.text = '';
-                                emptyOption.value = '';
-                                selectLeft.appendChild(emptyOption.cloneNode(true));
-                                selectRight.appendChild(emptyOption.cloneNode(true));
-    
-                                const selectedNamesLeft = [];
-                                const selectedNamesRight = [];
-    
-                                names.forEach((name, j) => {
-                                    if (attendance[j] === '○') {
-                                        const member = data.members.find(member => member.name === name);
-                                        if (member) {
-                                            const option = document.createElement('option');
-                                            option.text = name;
-                                            if (member.side === 'Left') {
-                                                selectLeft.appendChild(option);
-                                                if (selectedNamesLeft.includes(name)) {
-                                                    option.disabled = true;
-                                                }
-                                            } else if (member.side === 'Right') {
-                                                selectRight.appendChild(option);
-                                                if (selectedNamesRight.includes(name)) {
-                                                    option.disabled = true;
-                                                }
-                                            }
-                                        }
-                                    }
-                                });
-    
-                                selectLeft.addEventListener('change', (event) => {
-                                    const selectedName = event.target.value;
-                                    if (selectedName !== '') {
-                                        selectedNamesLeft.push(selectedName);
-                                        selectRight.querySelectorAll('option').forEach(option => {
-                                            if (option.text === selectedName) {
-                                                option.disabled = true;
-                                            }
-                                        });
-                                    }
-                                });
-    
-                                selectRight.addEventListener('change', (event) => {
-                                    const selectedName = event.target.value;
-                                    if (selectedName !== '') {
-                                        selectedNamesRight.push(selectedName);
-                                        selectLeft.querySelectorAll('option').forEach(option => {
-                                            if (option.text === selectedName) {
-                                                option.disabled = true;
-                                            }
-                                        });
-                                    }
-                                });
+                                populateOptions('left_' + i, 'right_' + i, names, attendance, data.members);
                             }
-
+    
                             // Populate paddler options for 小龍
                             for (let i = 1; i <= 8; i++) {
-                                const selectLeft = document.getElementById('small_left_' + i);
-                                const selectRight = document.getElementById('small_right_' + i);
-                                selectLeft.innerHTML = '';
-                                selectRight.innerHTML = '';
-
-                                const emptyOption = document.createElement('option');
-                                emptyOption.text = '';
-                                emptyOption.value = '';
-                                selectLeft.appendChild(emptyOption.cloneNode(true));
-                                selectRight.appendChild(emptyOption.cloneNode(true));
-
-                                const selectedNamesLeft = [];
-                                const selectedNamesRight = [];
-
-                                names.forEach((name, j) => {
-                                    if (attendance[j] === '○') {
-                                        const member = data.members.find(member => member.name === name);
-                                        if (member) {
-                                            const option = document.createElement('option');
-                                            option.text = name;
-                                            if (member.side === 'Left') {
-                                                selectLeft.appendChild(option);
-                                                if (selectedNamesLeft.includes(name)) {
-                                                    option.disabled = true;
-                                                }
-                                            } else if (member.side === 'Right') {
-                                                selectRight.appendChild(option);
-                                                if (selectedNamesRight.includes(name)) {
-                                                    option.disabled = true;
-                                                }
-                                            }
-                                        }
-                                    }
-                                });
-
-                                selectLeft.addEventListener('change', (event) => {
-                                    const selectedName = event.target.value;
-                                    if (selectedName !== '') {
-                                        selectedNamesLeft.push(selectedName);
-                                        selectRight.querySelectorAll('option').forEach(option => {
-                                            if (option.text === selectedName) {
-                                                option.disabled = true;
-                                            }
-                                        });
-                                    }
-                                });
-
-                                selectRight.addEventListener('change', (event) => {
-                                    const selectedName = event.target.value;
-                                    if (selectedName !== '') {
-                                        selectedNamesRight.push(selectedName);
-                                        selectLeft.querySelectorAll('option').forEach(option => {
-                                            if (option.text === selectedName) {
-                                                option.disabled = true;
-                                            }
-                                        });
-                                    }
-                                });
+                                populateOptions('small_left_' + i, 'small_right_' + i, names, attendance, data.members);
                             }
                         });
                 });
         }
     
+        function populateOptions(leftId, rightId, names, attendance, members) {
+            const selectLeft = document.getElementById(leftId);
+            const selectRight = document.getElementById(rightId);
+            selectLeft.innerHTML = '';
+            selectRight.innerHTML = '';
+
+            const emptyOption = document.createElement('option');
+            emptyOption.text = '';
+            emptyOption.value = '';
+            selectLeft.appendChild(emptyOption.cloneNode(true));
+            selectRight.appendChild(emptyOption.cloneNode(true));
+
+            const selectedNamesLeft = [];
+            const selectedNamesRight = [];
+
+            names.forEach((name, j) => {
+                if (attendance[j] === '○') {
+                    const member = members.find(member => member.name === name);
+                    if (member) {
+                        const option = document.createElement('option');
+                        option.text = name;
+                        if (member.side === 'Left') {
+                            selectLeft.appendChild(option);
+                            if (selectedNamesLeft.includes(name)) {
+                                option.disabled = true;
+                            }
+                        } else if (member.side === 'Right') {
+                            selectRight.appendChild(option);
+                            if (selectedNamesRight.includes(name)) {
+                                option.disabled = true;
+                            }
+                        }
+                    }
+                }
+            });
+
+            selectLeft.addEventListener('change', (event) => {
+                const selectedName = event.target.value;
+                if (selectedName !== '') {
+                    selectedNamesLeft.push(selectedName);
+                    selectRight.querySelectorAll('option').forEach(option => {
+                        if (option.text === selectedName) {
+                            option.disabled = true;
+                        }
+                    });
+                }
+            });
+
+            selectRight.addEventListener('change', (event) => {
+                const selectedName = event.target.value;
+                if (selectedName !== '') {
+                    selectedNamesRight.push(selectedName);
+                    selectLeft.querySelectorAll('option').forEach(option => {
+                        if (option.text === selectedName) {
+                            option.disabled = true;
+                        }
+                    });
+                }
+            });
+        }
         // Populate select dropdown with dates
         fetch('/api/attendance')
             .then(response => response.json())
@@ -249,6 +217,6 @@
             });
     
         getAttendance(); // To populate the initial attendance list and paddler arrangement
-    </script>
+    </script>    
 </body>
 </html>
