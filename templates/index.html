@@ -20,85 +20,115 @@
         </div>
         <div class="container">
             <h1>Dragon Boat Team Paddle Arrangement</h1>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">左</th>
-                        <th scope="col">右</th>
-                    </tr>
-                </thead>
-                <tbody id="paddleTableBody">
-                    <!-- Rows for 3*12 table -->
-                    <tr><td>1</td><td><select class="form-select" id="left_1"></select></td><td><select class="form-select" id="right_1"></select></td></tr>
-                    <tr><td>2</td><td><select class="form-select" id="left_2"></select></td><td><select class="form-select" id="right_2"></select></td></tr>
-                    <tr><td>3</td><td><select class="form-select" id="left_3"></select></td><td><select class="form-select" id="right_3"></select></td></tr>
-                    <tr><td>4</td><td><select class="form-select" id="left_4"></select></td><td><select class="form-select" id="right_4"></select></td></tr>
-                    <tr><td>5</td><td><select class="form-select" id="left_5"></select></td><td><select class="form-select" id="right_5"></select></td></tr>
-                    <tr><td>6</td><td><select class="form-select" id="left_6"></select></td><td><select class="form-select" id="right_6"></select></td></tr>
-                    <tr><td>7</td><td><select class="form-select" id="left_7"></select></td><td><select class="form-select" id="right_7"></select></td></tr>
-                    <tr><td>8</td><td><select class="form-select" id="left_8"></select></td><td><select class="form-select" id="right_8"></select></td></tr>
-                    <tr><td>9</td><td><select class="form-select" id="left_9"></select></td><td><select class="form-select" id="right_9"></select></td></tr>
-                    <tr><td>10</td><td><select class="form-select" id="left_10"></select></td><td><select class="form-select" id="right_10"></select></td></tr>
-                    <tr><td>11</td><td><select class="form-select" id="left_11"></select></td><td><select class="form-select" id="right_11"></select></td></tr>
-                    <tr><td>12</td><td><select class="form-select" id="left_12"></select></td><td><select class="form-select" id="right_12"></select></td></tr>
-                </tbody>
-            </table>
+            <div class="row">
+                <div class="col-sm">
+                    <table class="table">
+                        <caption class="caption-top">
+                            大龍
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">左</th>
+                                <th scope="col">右</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paddleTableBody">
+                            <!-- Rows for 3*12 table -->
+                            <tr><td>1</td><td><select class="form-select" id="left_1"></select></td><td><select class="form-select" id="right_1"></select></td></tr>
+                            <tr><td>2</td><td><select class="form-select" id="left_2"></select></td><td><select class="form-select" id="right_2"></select></td></tr>
+                            <tr><td>3</td><td><select class="form-select" id="left_3"></select></td><td><select class="form-select" id="right_3"></select></td></tr>
+                            <tr><td>4</td><td><select class="form-select" id="left_4"></select></td><td><select class="form-select" id="right_4"></select></td></tr>
+                            <tr><td>5</td><td><select class="form-select" id="left_5"></select></td><td><select class="form-select" id="right_5"></select></td></tr>
+                            <tr><td>6</td><td><select class="form-select" id="left_6"></select></td><td><select class="form-select" id="right_6"></select></td></tr>
+                            <tr><td>7</td><td><select class="form-select" id="left_7"></select></td><td><select class="form-select" id="right_7"></select></td></tr>
+                            <tr><td>8</td><td><select class="form-select" id="left_8"></select></td><td><select class="form-select" id="right_8"></select></td></tr>
+                            <tr><td>9</td><td><select class="form-select" id="left_9"></select></td><td><select class="form-select" id="right_9"></select></td></tr>
+                            <tr><td>10</td><td><select class="form-select" id="left_10"></select></td><td><select class="form-select" id="right_10"></select></td></tr>
+                            <tr><td>11</td><td><select class="form-select" id="left_11"></select></td><td><select class="form-select" id="right_11"></select></td></tr>
+                            <tr><td>12</td><td><select class="form-select" id="left_12"></select></td><td><select class="form-select" id="right_12"></select></td></tr>
+                        </tbody>
+                    </table>
+                </div>    
+                <div class="col-sm">
+                    <table class="table">
+                        <caption class="caption-top">
+                            小龍
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">左</th>
+                                <th scope="col">右</th>
+                            </tr>
+                        </thead>
+                        <tbody id="smallPaddleTableBody"> 
+                            <tr><td>1</td><td><select class="form-select" id="small_left_1"></select></td><td><select class="form-select" id="small_right_1"></select></td></tr>
+                            <tr><td>2</td><td><select class="form-select" id="small_left_2"></select></td><td><select class="form-select" id="small_right_2"></select></td></tr>
+                            <tr><td>3</td><td><select class="form-select" id="small_left_3"></select></td><td><select class="form-select" id="small_right_3"></select></td></tr>
+                            <tr><td>4</td><td><select class="form-select" id="small_left_4"></select></td><td><select class="form-select" id="small_right_4"></select></td></tr>
+                            <tr><td>5</td><td><select class="form-select" id="small_left_5"></select></td><td><select class="form-select" id="small_right_5"></select></td></tr>
+                            <tr><td>6</td><td><select class="form-select" id="small_left_6"></select></td><td><select class="form-select" id="small_right_6"></select></td></tr>
+                            <tr><td>7</td><td><select class="form-select" id="small_left_7"></select></td><td><select class="form-select" id="small_right_7"></select></td></tr>
+                            <tr><td>8</td><td><select class="form-select" id="small_left_8"></select></td><td><select class="form-select" id="small_right_8"></select></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
         <ul id="attendanceList" class="mt-3 list-group"></ul>
     </div>
     <div class="container mt-3">
         <button onclick="window.location.href='/members'" class="btn btn-primary">Member Management</button>
     </div>
-
     <script>
-    function getAttendance() {
-        const selectDate = document.getElementById('selectDate').value;
-
-        fetch('/api/attendance')
-            .then(response => response.json())
-            .then(data => {
-                const dates = data.dates;
-                const index = dates.indexOf(selectDate);
-                const names = data.names;
-                const attendance = data.attendance[index];
-
-                const attendanceList = document.getElementById('attendanceList');
-                attendanceList.innerHTML = ''; // Clear previous list
-
-                names.forEach((name, i) => {
-                    if (attendance[i] === '○') {
-                        const listItem = document.createElement('li');
-                        listItem.textContent = `${name}: ${attendance[i]}`;
-                        attendanceList.appendChild(listItem);
-                    }
-                });
-
-                fetch('/api/current_members')
-                    .then(response => response.json())
-                    .then(data => {
-                        for (let i = 1; i <= 12; i++) {
-                            const selectLeft = document.getElementById('left_' + i);
-                            const selectRight = document.getElementById('right_' + i);
-                            selectLeft.innerHTML = '';
-                            selectRight.innerHTML = '';
-
-                            const emptyOption = document.createElement('option');
-                            emptyOption.text = '';
-                            emptyOption.value = '';
-                            selectLeft.appendChild(emptyOption.cloneNode(true));
-                            selectRight.appendChild(emptyOption.cloneNode(true));
-
-                            const selectedNamesLeft = [];
-                            const selectedNamesRight = [];
-
-                            names.forEach((name, j) => {
-                                if (attendance[j] === '○') {
-                                    const member = data.members.find(member => member.name === name);
-                                    if (member) {
-                                        const option = document.createElement('option');
-                                        option.text = name;
-                                        if (member.category === '大混'){
+        function getAttendance() {
+            const selectDate = document.getElementById('selectDate').value;
+    
+            fetch('/api/attendance')
+                .then(response => response.json())
+                .then(data => {
+                    const dates = data.dates;
+                    const index = dates.indexOf(selectDate);
+                    const names = data.names;
+                    const attendance = data.attendance[index];
+    
+                    const attendanceList = document.getElementById('attendanceList');
+                    attendanceList.innerHTML = ''; // Clear previous list
+    
+                    names.forEach((name, i) => {
+                        if (attendance[i] === '○') {
+                            const listItem = document.createElement('li');
+                            listItem.textContent = `${name}: ${attendance[i]}`;
+                            attendanceList.appendChild(listItem);
+                        }
+                    });
+    
+                    fetch('/api/current_members')
+                        .then(response => response.json())
+                        .then(data => {
+                            // Populate paddler options for both 大龍 and 小龍
+                            for (let i = 1; i <= 12; i++) {
+                                const selectLeft = document.getElementById('left_' + i);
+                                const selectRight = document.getElementById('right_' + i);
+                                selectLeft.innerHTML = '';
+                                selectRight.innerHTML = '';
+    
+                                const emptyOption = document.createElement('option');
+                                emptyOption.text = '';
+                                emptyOption.value = '';
+                                selectLeft.appendChild(emptyOption.cloneNode(true));
+                                selectRight.appendChild(emptyOption.cloneNode(true));
+    
+                                const selectedNamesLeft = [];
+                                const selectedNamesRight = [];
+    
+                                names.forEach((name, j) => {
+                                    if (attendance[j] === '○') {
+                                        const member = data.members.find(member => member.name === name);
+                                        if (member) {
+                                            const option = document.createElement('option');
+                                            option.text = name;
                                             if (member.side === 'Left') {
                                                 selectLeft.appendChild(option);
                                                 if (selectedNamesLeft.includes(name)) {
@@ -112,53 +142,113 @@
                                             }
                                         }
                                     }
-                                }
-                            });
+                                });
+    
+                                selectLeft.addEventListener('change', (event) => {
+                                    const selectedName = event.target.value;
+                                    if (selectedName !== '') {
+                                        selectedNamesLeft.push(selectedName);
+                                        selectRight.querySelectorAll('option').forEach(option => {
+                                            if (option.text === selectedName) {
+                                                option.disabled = true;
+                                            }
+                                        });
+                                    }
+                                });
+    
+                                selectRight.addEventListener('change', (event) => {
+                                    const selectedName = event.target.value;
+                                    if (selectedName !== '') {
+                                        selectedNamesRight.push(selectedName);
+                                        selectLeft.querySelectorAll('option').forEach(option => {
+                                            if (option.text === selectedName) {
+                                                option.disabled = true;
+                                            }
+                                        });
+                                    }
+                                });
+                            }
 
-                            selectLeft.addEventListener('change', (event) => {
-                                const selectedName = event.target.value;
-                                if (selectedName !== '') {
-                                    selectedNamesLeft.push(selectedName);
-                                    selectRight.querySelectorAll('option').forEach(option => {
-                                        if (option.text === selectedName) {
-                                            option.disabled = true;
+                            // Populate paddler options for 小龍
+                            for (let i = 1; i <= 8; i++) {
+                                const selectLeft = document.getElementById('small_left_' + i);
+                                const selectRight = document.getElementById('small_right_' + i);
+                                selectLeft.innerHTML = '';
+                                selectRight.innerHTML = '';
+
+                                const emptyOption = document.createElement('option');
+                                emptyOption.text = '';
+                                emptyOption.value = '';
+                                selectLeft.appendChild(emptyOption.cloneNode(true));
+                                selectRight.appendChild(emptyOption.cloneNode(true));
+
+                                const selectedNamesLeft = [];
+                                const selectedNamesRight = [];
+
+                                names.forEach((name, j) => {
+                                    if (attendance[j] === '○') {
+                                        const member = data.members.find(member => member.name === name);
+                                        if (member) {
+                                            const option = document.createElement('option');
+                                            option.text = name;
+                                            if (member.side === 'Left') {
+                                                selectLeft.appendChild(option);
+                                                if (selectedNamesLeft.includes(name)) {
+                                                    option.disabled = true;
+                                                }
+                                            } else if (member.side === 'Right') {
+                                                selectRight.appendChild(option);
+                                                if (selectedNamesRight.includes(name)) {
+                                                    option.disabled = true;
+                                                }
+                                            }
                                         }
-                                    });
-                                }
-                            });
+                                    }
+                                });
 
-                            selectRight.addEventListener('change', (event) => {
-                                const selectedName = event.target.value;
-                                if (selectedName !== '') {
-                                    selectedNamesRight.push(selectedName);
-                                    selectLeft.querySelectorAll('option').forEach(option => {
-                                        if (option.text === selectedName) {
-                                            option.disabled = true;
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                    });
+                                selectLeft.addEventListener('change', (event) => {
+                                    const selectedName = event.target.value;
+                                    if (selectedName !== '') {
+                                        selectedNamesLeft.push(selectedName);
+                                        selectRight.querySelectorAll('option').forEach(option => {
+                                            if (option.text === selectedName) {
+                                                option.disabled = true;
+                                            }
+                                        });
+                                    }
+                                });
+
+                                selectRight.addEventListener('change', (event) => {
+                                    const selectedName = event.target.value;
+                                    if (selectedName !== '') {
+                                        selectedNamesRight.push(selectedName);
+                                        selectLeft.querySelectorAll('option').forEach(option => {
+                                            if (option.text === selectedName) {
+                                                option.disabled = true;
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                });
+        }
+    
+        // Populate select dropdown with dates
+        fetch('/api/attendance')
+            .then(response => response.json())
+            .then(data => {
+                const selectDate = document.getElementById('selectDate');
+                selectDate.innerHTML = '';
+                data.dates.forEach(date => {
+                    const option = document.createElement('option');
+                    option.text = date;
+                    option.value = date;
+                    selectDate.appendChild(option);
+                });
             });
-    }
-
-    // Populate select dropdown with dates
-    fetch('/api/attendance')
-        .then(response => response.json())
-        .then(data => {
-            const selectDate = document.getElementById('selectDate');
-            selectDate.innerHTML = '';
-            data.dates.forEach(date => {
-                const option = document.createElement('option');
-                option.text = date;
-                option.value = date;
-                selectDate.appendChild(option);
-            });
-        });
-
-    getAttendance(); // To populate the initial attendance list and paddler arrangement
-
+    
+        getAttendance(); // To populate the initial attendance list and paddler arrangement
     </script>
 </body>
 </html>
