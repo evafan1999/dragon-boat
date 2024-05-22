@@ -5,6 +5,13 @@
     <!-- Bootstrap CSS -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        .card {
+            margin: 5px 0;
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-4">
@@ -20,7 +27,7 @@
         </div>
         <div class="container" style="margin-top: 10px;">
             <div class="row">
-                <div class="col-sm">
+                <div class="col-sm" id="bigDragonTableContainer">
                     <table class="table table-sm">
                         <caption class="caption-top">大龍</caption>
                         <thead>
@@ -31,22 +38,24 @@
                             </tr>
                         </thead>
                         <tbody id="paddleTableBody">
-                            <tr><td>1</td><td><select class="form-select" id="left_1"></select></td><td><select class="form-select" id="right_1"></select></td></tr>
-                            <tr><td>2</td><td><select class="form-select" id="left_2"></select></td><td><select class="form-select" id="right_2"></select></td></tr>
-                            <tr><td>3</td><td><select class="form-select" id="left_3"></select></td><td><select class="form-select" id="right_3"></select></td></tr>
-                            <tr><td>4</td><td><select class="form-select" id="left_4"></select></td><td><select class="form-select" id="right_4"></select></td></tr>
-                            <tr><td>5</td><td><select class="form-select" id="left_5"></select></td><td><select class="form-select" id="right_5"></select></td></tr>
-                            <tr><td>6</td><td><select class="form-select" id="left_6"></select></td><td><select class="form-select" id="right_6"></select></td></tr>
-                            <tr><td>7</td><td><select class="form-select" id="left_7"></select></td><td><select class="form-select" id="right_7"></select></td></tr>
-                            <tr><td>8</td><td><select class="form-select" id="left_8"></select></td><td><select class="form-select" id="right_8"></select></td></tr>
-                            <tr><td>9</td><td><select class="form-select" id="left_9"></select></td><td><select class="form-select" id="right_9"></select></td></tr>
-                            <tr><td>10</td><td><select class="form-select" id="left_10"></select></td><td><select class="form-select" id="right_10"></select></td></tr>
-                            <tr><td>11</td><td><select class="form-select" id="left_11"></select></td><td><select class="form-select" id="right_11"></select></td></tr>
-                            <tr><td>12</td><td><select class="form-select" id="left_12"></select></td><td><select class="form-select" id="right_12"></select></td></tr>
+                            <tr><td>1</td><td><select class="form-select" id="left_1" onchange="updateWeights()"></select></td><td><select class="form-select" id="right_1" onchange="updateWeights()"></select></td></tr>
+                            <tr><td>2</td><td><select class="form-select" id="left_2" onchange="updateWeights()"></select></td><td><select class="form-select" id="right_2" onchange="updateWeights()"></select></td></tr>
+                            <tr><td>3</td><td><select class="form-select" id="left_3" onchange="updateWeights()"></select></td><td><select class="form-select" id="right_3" onchange="updateWeights()"></select></td></tr>
+                            <tr><td>4</td><td><select class="form-select" id="left_4" onchange="updateWeights()"></select></td><td><select class="form-select" id="right_4" onchange="updateWeights()"></select></td></tr>
+                            <tr><td>5</td><td><select class="form-select" id="left_5" onchange="updateWeights()"></select></td><td><select class="form-select" id="right_5" onchange="updateWeights()"></select></td></tr>
+                            <tr><td>6</td><td><select class="form-select" id="left_6" onchange="updateWeights()"></select></td><td><select class="form-select" id="right_6" onchange="updateWeights()"></select></td></tr>
+                            <tr><td>7</td><td><select class="form-select" id="left_7" onchange="updateWeights()"></select></td><td><select class="form-select" id="right_7" onchange="updateWeights()"></select></td></tr>
+                            <tr><td>8</td><td><select class="form-select" id="left_8" onchange="updateWeights()"></select></td><td><select class="form-select" id="right_8" onchange="updateWeights()"></select></td></tr>
+                            <tr><td>9</td><td><select class="form-select" id="left_9" onchange="updateWeights()"></select></td><td><select class="form-select" id="right_9" onchange="updateWeights()"></select></td></tr>
+                            <tr><td>10</td><td><select class="form-select" id="left_10" onchange="updateWeights()"></select></td><td><select class="form-select" id="right_10" onchange="updateWeights()"></select></td></tr>
+                            <tr><td>11</td><td><select class="form-select" id="left_11" onchange="updateWeights()"></select></td><td><select class="form-select" id="right_11" onchange="updateWeights()"></select></td></tr>
+                            <tr><td>12</td><td><select class="form-select" id="left_12" onchange="updateWeights()"></select></td><td><select class="form-select" id="right_12" onchange="updateWeights()"></select></td></tr>
+                            <tr><td>舵手</td><td><select class="form-select" id="left_helmsman" onchange="updateWeights()"></select></td><td></td></tr>
+                            <tr><td>重量</td><td id="leftWeight">0</td><td id="rightWeight">0</td></tr>
                         </tbody>
                     </table>
                 </div>    
-                <div class="col-sm">
+                <div class="col-sm" id="smallDragonTableContainer">
                     <table class="table table-sm">
                         <caption class="caption-top">小龍</caption>
                         <thead>
@@ -57,23 +66,30 @@
                             </tr>
                         </thead>
                         <tbody id="smallPaddleTableBody"> 
-                            <tr><td>1</td><td><select class="form-select" id="small_left_1"></select></td><td><select class="form-select" id="small_right_1"></select></td></tr>
-                            <tr><td>2</td><td><select class="form-select" id="small_left_2"></select></td><td><select class="form-select" id="small_right_2"></select></td></tr>
-                            <tr><td>3</td><td><select class="form-select" id="small_left_3"></select></td><td><select class="form-select" id="small_right_3"></select></td></tr>
-                            <tr><td>4</td><td><select class="form-select" id="small_left_4"></select></td><td><select class="form-select" id="small_right_4"></select></td></tr>
-                            <tr><td>5</td><td><select class="form-select" id="small_left_5"></select></td><td><select class="form-select" id="small_right_5"></select></td></tr>
-                            <tr><td>6</td><td><select class="form-select" id="small_left_6"></select></td><td><select class="form-select" id="small_right_6"></select></td></tr>
-                            <tr><td>7</td><td><select class="form-select" id="small_left_7"></select></td><td><select class="form-select" id="small_right_7"></select></td></tr>
-                            <tr><td>8</td><td><select class="form-select" id="small_left_8"></select></td><td><select class="form-select" id="small_right_8"></select></td></tr>
+                            <tr><td>1</td><td><select class="form-select" id="small_left_1" onchange="updateWeights()"></select></td><td><select class="form-select" id="small_right_1" onchange="updateWeights()"></select></td></tr>
+                            <tr><td>2</td><td><select class="form-select" id="small_left_2" onchange="updateWeights()"></select></td><td><select class="form-select" id="small_right_2" onchange="updateWeights()"></select></td></tr>
+                            <tr><td>3</td><td><select class="form-select" id="small_left_3" onchange="updateWeights()"></select></td><td><select class="form-select" id="small_right_3" onchange="updateWeights()"></select></td></tr>
+                            <tr><td>4</td><td><select class="form-select" id="small_left_4" onchange="updateWeights()"></select></td><td><select class="form-select" id="small_right_4" onchange="updateWeights()"></select></td></tr>
+                            <tr><td>5</td><td><select class="form-select" id="small_left_5" onchange="updateWeights()"></select></td><td><select class="form-select" id="small_right_5" onchange="updateWeights()"></select></td></tr>
+                            <tr><td>6</td><td><select class="form-select" id="small_left_6" onchange="updateWeights()"></select></td><td><select class="form-select" id="small_right_6" onchange="updateWeights()"></select></td></tr>
+                            <tr><td>7</td><td><select class="form-select" id="small_left_7" onchange="updateWeights()"></select></td><td><select class="form-select" id="small_right_7" onchange="updateWeights()"></select></td></tr>
+                            <tr><td>8</td><td><select class="form-select" id="small_left_8" onchange="updateWeights()"></select></td><td><select class="form-select" id="small_right_8" onchange="updateWeights()"></select></td></tr>
+                            <tr><td>舵手</td><td><select class="form-select" id="small_helmsman" onchange="updateWeights()"></select></td><td></td></tr>
+                            <tr><td>重量</td><td id="smallLeftWeight">0</td><td id="smallRightWeight">0</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-        <ul id="attendanceList" class="mt-3 list-group"></ul>
+        <div class="container mt-3">
+            <button onclick="exportTableToImage('bigDragonTableContainer')" class="btn" style="margin-bottom: 10px; background-color: green; color: white;">Print Big Dragon</button>
+            <button onclick="exportTableToImage('smallDragonTableContainer')" class="btn" style="margin-bottom: 10px; background-color: blue; color: white;">Print Small Dragon</button>
+        </div>
+        <h4 style="padding: 10px;">今日出席人員</h4>
+        <div id="attendanceList" class="mt-3"></div>
     </div>
     <div class="container mt-3">
-        <button onclick="window.location.href='/members'" class="btn" style="margin-bottom: 10px; background-color: black; color: white;">Member Management</button>
+        <button onclick="window.location.href='/members'" class="btn" style="margin-bottom: 10px; background-color: black; color: white;" disabled>Member Management</button>
     </div>
     <script>
         async function getAttendance() {
@@ -89,13 +105,26 @@
             const attendanceList = document.getElementById('attendanceList');
             attendanceList.innerHTML = ''; // Clear previous list
 
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'row';
+
             names.forEach((name, i) => {
                 if (attendance[i] === '○') {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = `${name}: ${attendance[i]}`;
-                    attendanceList.appendChild(listItem);
+                    const cardCol = document.createElement('div');
+                    cardCol.className = 'col-6 col-md-2'; // Bootstrap column for responsiveness
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <div class="card-body">
+                            <h5 class="card-title">${name}</h5>
+                        </div>
+                    `;
+                    cardCol.appendChild(card);
+                    rowDiv.appendChild(cardCol);
                 }
             });
+
+            attendanceList.appendChild(rowDiv);
 
             const membersResponse = await fetch('/api/current_members');
             const membersData = await membersResponse.json();
@@ -105,25 +134,34 @@
             const smallDragonLeftMembers = membersData.members.filter(member => member.category === '小混' && member.side === 'Left' && attendance[names.indexOf(member.name)] === '○');
             const smallDragonRightMembers = membersData.members.filter(member => member.category === '小混' && member.side === 'Right' && attendance[names.indexOf(member.name)] === '○');
 
+            // 所有今日出席的隊員
+            const allPresentMembers = membersData.members.filter(member => attendance[names.indexOf(member.name)] === '○');
+            // 所有不在今日出席名單中的隊員
+            const allAbsentMembers = membersData.members.filter(member => attendance[names.indexOf(member.name)] !== '○');
+
             console.log('Big Dragon Left:', bigDragonLeftMembers);
             console.log('Big Dragon Right:', bigDragonRightMembers);
             console.log('Small Dragon Left:', smallDragonLeftMembers);
             console.log('Small Dragon Right:', smallDragonRightMembers);
+            console.log('All Present Members:', allPresentMembers);
+            console.log('All Absent Members:', allAbsentMembers);
 
             // Populate paddler options for 大龍
             for (let i = 1; i <= 12; i++) {
-                populateOptions('left_' + i, 'right_' + i, bigDragonLeftMembers, bigDragonRightMembers, smallDragonLeftMembers, smallDragonRightMembers);
+                populateOptions('left_' + i, 'right_' + i, bigDragonLeftMembers, bigDragonRightMembers, smallDragonLeftMembers, smallDragonRightMembers, allAbsentMembers);
             }
+            populateHelmsmanOptions('left_helmsman', allPresentMembers, allAbsentMembers);
 
             // Populate paddler options for 小龍
             for (let i = 1; i <= 8; i++) {
-                populateOptions('small_left_' + i, 'small_right_' + i, bigDragonLeftMembers, bigDragonRightMembers, smallDragonLeftMembers, smallDragonRightMembers);
+                populateOptions('small_left_' + i, 'small_right_' + i, bigDragonLeftMembers, bigDragonRightMembers, smallDragonLeftMembers, smallDragonRightMembers, allAbsentMembers);
             }
+            populateHelmsmanOptions('small_helmsman', allPresentMembers, allAbsentMembers);
 
             disableSelectedOptions();
         }
 
-        function populateOptions(leftId, rightId, bigDragonLeftMembers, bigDragonRightMembers, smallDragonLeftMembers, smallDragonRightMembers) {
+        function populateOptions(leftId, rightId, bigDragonLeftMembers, bigDragonRightMembers, smallDragonLeftMembers, smallDragonRightMembers, allAbsentMembers) {
             const selectLeft = document.getElementById(leftId);
             const selectRight = document.getElementById(rightId);
             selectLeft.innerHTML = '';
@@ -151,10 +189,19 @@
             optgroupSmallRight.label = '小混 - 右';
             selectRight.appendChild(optgroupSmallRight);
 
+            const optgroupOthersLeft = document.createElement('optgroup');
+            optgroupOthersLeft.label = '其他';
+            selectLeft.appendChild(optgroupOthersLeft);
+
+            const optgroupOthersRight = document.createElement('optgroup');
+            optgroupOthersRight.label = '其他';
+            selectRight.appendChild(optgroupOthersRight);
+
             bigDragonLeftMembers.forEach(member => {
                 const option = document.createElement('option');
                 option.text = member.name;
                 option.value = member.name;
+                option.dataset.weight = member.weight;
                 optgroupBigLeft.appendChild(option.cloneNode(true));
             });
 
@@ -162,6 +209,7 @@
                 const option = document.createElement('option');
                 option.text = member.name;
                 option.value = member.name;
+                option.dataset.weight = member.weight;
                 optgroupBigRight.appendChild(option.cloneNode(true));
             });
 
@@ -169,6 +217,7 @@
                 const option = document.createElement('option');
                 option.text = member.name;
                 option.value = member.name;
+                option.dataset.weight = member.weight;
                 optgroupSmallLeft.appendChild(option.cloneNode(true));
             });
 
@@ -176,11 +225,57 @@
                 const option = document.createElement('option');
                 option.text = member.name;
                 option.value = member.name;
+                option.dataset.weight = member.weight;
                 optgroupSmallRight.appendChild(option.cloneNode(true));
+            });
+
+            allAbsentMembers.forEach(member => {
+                const option = document.createElement('option');
+                option.text = member.name;
+                option.value = member.name;
+                option.dataset.weight = member.weight;
+                optgroupOthersLeft.appendChild(option.cloneNode(true));
+                optgroupOthersRight.appendChild(option.cloneNode(true));
             });
 
             selectLeft.addEventListener('change', disableSelectedOptions);
             selectRight.addEventListener('change', disableSelectedOptions);
+        }
+
+        function populateHelmsmanOptions(helmsmanId, allPresentMembers, allAbsentMembers) {
+            const selectHelmsman = document.getElementById(helmsmanId);
+            selectHelmsman.innerHTML = '';
+
+            const emptyOption = document.createElement('option');
+            emptyOption.text = '';
+            emptyOption.value = '';
+            selectHelmsman.appendChild(emptyOption.cloneNode(true));
+
+            const optgroupPresent = document.createElement('optgroup');
+            optgroupPresent.label = '今日出席';
+            selectHelmsman.appendChild(optgroupPresent);
+
+            const optgroupAbsent = document.createElement('optgroup');
+            optgroupAbsent.label = '其他';
+            selectHelmsman.appendChild(optgroupAbsent);
+
+            allPresentMembers.forEach(member => {
+                const option = document.createElement('option');
+                option.text = member.name;
+                option.value = member.name;
+                option.dataset.weight = member.weight;
+                optgroupPresent.appendChild(option.cloneNode(true));
+            });
+
+            allAbsentMembers.forEach(member => {
+                const option = document.createElement('option');
+                option.text = member.name;
+                option.value = member.name;
+                option.dataset.weight = member.weight;
+                optgroupAbsent.appendChild(option.cloneNode(true));
+            });
+
+            selectHelmsman.addEventListener('change', disableSelectedOptions);
         }
 
         function disableSelectedOptions() {
@@ -205,6 +300,49 @@
                     }
                 }
             });
+
+            updateWeights(); // Update weights whenever options are disabled or enabled
+        }
+
+        function updateWeights() {
+            let leftWeight = 0;
+            let rightWeight = 0;
+            let smallLeftWeight = 0;
+            let smallRightWeight = 0;
+
+            const bigDragonLeftSelects = document.querySelectorAll('[id^="left_"]');
+            const bigDragonRightSelects = document.querySelectorAll('[id^="right_"]');
+            const smallDragonLeftSelects = document.querySelectorAll('[id^="small_left_"]');
+            const smallDragonRightSelects = document.querySelectorAll('[id^="small_right_"]');
+
+            bigDragonLeftSelects.forEach(select => {
+                if (select.value) {
+                    leftWeight += parseFloat(select.options[select.selectedIndex].dataset.weight) || 0;
+                }
+            });
+
+            bigDragonRightSelects.forEach(select => {
+                if (select.value) {
+                    rightWeight += parseFloat(select.options[select.selectedIndex].dataset.weight) || 0;
+                }
+            });
+
+            smallDragonLeftSelects.forEach(select => {
+                if (select.value) {
+                    smallLeftWeight += parseFloat(select.options[select.selectedIndex].dataset.weight) || 0;
+                }
+            });
+
+            smallDragonRightSelects.forEach(select => {
+                if (select.value) {
+                    smallRightWeight += parseFloat(select.options[select.selectedIndex].dataset.weight) || 0;
+                }
+            });
+
+            document.getElementById('leftWeight').textContent = leftWeight.toFixed(2);
+            document.getElementById('rightWeight').textContent = rightWeight.toFixed(2);
+            document.getElementById('smallLeftWeight').textContent = smallLeftWeight.toFixed(2);
+            document.getElementById('smallRightWeight').textContent = smallRightWeight.toFixed(2);
         }
 
         // Populate select dropdown with dates
@@ -221,8 +359,19 @@
             });
         }
 
+        // Export table to image
+        function exportTableToImage(tableId) {
+            const tableContainer = document.getElementById(tableId);
+            html2canvas(tableContainer).then(canvas => {
+                const link = document.createElement('a');
+                link.download = tableId + '.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+
         // Initial load
         populateDates().then(getAttendance);
-    </script>    
+    </script>
 </body>
 </html>
