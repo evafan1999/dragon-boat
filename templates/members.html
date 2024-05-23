@@ -212,6 +212,9 @@
             if (isEdited && !confirm("您有未保存的更改。是否繼續並清除資料庫？")) {
                 return;
             }
+            if (!confirm("您確定要清除資料庫嗎？此操作將無法還原。")) {
+                return;
+            }
             showLoading();
             try {
                 const response = await fetch('/api/clear_database', { method: 'DELETE' });
