@@ -1,258 +1,239 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dragon Boat Team Management System</title>
-    <!-- Bootstrap JS and dependencies -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Member Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-4">
-        <h1>Dragon Boat Team Management System</h1>
-        
-        <!-- Roster Section -->
-        <h2>Roster</h2>
-        <table class="table">
+        <h1>成員管理</h1>
+        <button class="btn btn-primary mb-3" onclick="addNewMemberRow()">新增成員</button>
+        <button class="btn btn-danger mb-3" onclick="clearDatabase()">清除資料庫</button>
+        <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Paddle Side</th>
-                    <th>Category</th>
+                    <th>編號</th>
+                    <th>名稱</th>
+                    <th>側別</th>
+                    <th>體重</th>
+                    <th>分類</th>
+                    <th>操作</th>
                 </tr>
             </thead>
-            <tbody id="rosterBody">
-                <!-- Dynamic roster data will be displayed here -->
+            <tbody id="memberTableBody">
+                <!-- 成員資料將在這裡顯示 -->
             </tbody>
         </table>
-        <div class="container">
-            <div class="row">
-                <div class="col">
-                    <label for="nameSelect" class="form-label">Name:</label>
-                    <select id="nameSelect" class="form-select"></select>
-                </div>
-                <div class="col">
-                    <label for="sideSelect" class="form-label">Paddle Side:</label>
-                    <select id="sideSelect" class="form-select">
-                        <option value="Right">右</option>
-                        <option value="Left">左</option>
-                    </select>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <label for="weightSelect" class="form-label">Weight:</label>
-                    <input class="input-group" type="number" id="weightInput" step="0.01" placeholder="0.00">
-                </div>
-                <div class="col">
-                    <label for="categorySelect" class="form-label">Category:</label>
-                    <select id="categorySelect" class="form-select">
-                        <option value="大混">大混</option>
-                        <option value="小混">小混</option>
-                        <option value="大男">大男</option>
-                        <option value="大女">大女</option>
-                        <option value="小男">小男</option>
-                        <option value="小女">小女</option>
-                    </select>
-                </div>
-            </div>
-            <div class="row" style="margin-top: 10px;">
-                <div class="mb-3">
-                    <button onclick="addPerson()" class="btn btn-primary">Add Member</button>
-                    <button onclick="saveRoster()" class="btn btn-success">Save Member List</button>
-                    <input type="hidden" id="memberListInput" name="memberList">
-                </div>
-            </div>
-
-        </div>
-
-
-        <!-- Recent Events Section -->
-        <h2>Recent Events</h2>
-        <div class="mb-3">
-            <label for="eventInput" class="form-label">Event Name:</label>
-            <input type="text" id="eventInput" class="form-control">
-        </div>
-        <div class="mb-3">
-            <label for="specificationsSelect" class="form-label">Event Specifications:</label>
-            <select id="specificationsSelect" class="form-select" multiple>
-                <option value="Open Men">Open Men</option>
-                <option value="Open Women">Open Women</option>
-                <option value="Open Mixed">Open Mixed</option>
-                <option value="Junior Men">Junior Men</option>
-                <option value="Junior Women">Junior Women</option>
-                <option value="Junior Mixed">Junior Mixed</option>
-            </select>
-        </div>
-        <button onclick="addEvent()" class="btn btn-primary">Add Event</button>
-
-        <ul id="eventList" class="mt-3 list-group"></ul>
+        <button class="btn btn-success" id="updateMembersButton" onclick="updateMembers()" disabled>更新成員</button>
     </div>
 
-    <div class="container mt-4">
-        <h2>Current Members</h2>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Delete</th>
-                    <th>Name</th>
-                    <th>Paddle Side</th>
-                    <th>Weight</th>
-                    <th>Category</th>
-                </tr>
-            </thead>
-            <tbody id="currentMembers">
-                <!-- Current members from the database will be displayed here -->
-            </tbody>
-            <button onclick="clearDatabase()" class="btn btn-danger">Clear All Data</button>
-        </table>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
     </div>
 
     <script>
-        // Populate select dropdown with names
-        fetch('/api/attendance')
-            .then(response => response.json())
-            .then(data => {
-                const nameSelect = document.getElementById('nameSelect');
-                data.names.forEach(name => {
-                    const option = document.createElement('option');
-                    option.text = name;
-                    option.value = name;
-                    nameSelect.appendChild(option);
-                });
+        let isEdited = false;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchMembers();
+
+            // 監聽表單變更事件
+            document.getElementById('memberTableBody').addEventListener('input', () => {
+                isEdited = true;
+                document.getElementById('updateMembersButton').disabled = false;
             });
 
-        let memberList = []; // 宣告一個全域的 memberList
+            // 監聽頁面離開事件
+            window.addEventListener('beforeunload', (event) => {
+                if (isEdited) {
+                    event.preventDefault();
+                    event.returnValue = '';
+                }
+            });
+        });
 
-        function addPerson() {
-            const name = document.getElementById('nameSelect').value;
-            const side = document.getElementById('sideSelect').value;
-            const weight = parseFloat(document.getElementById('weightInput').value);
-            const category = document.getElementById('categorySelect').value;
-            const rosterBody = document.getElementById('rosterBody');
-
-            // Check if the name already exists in the roster
-            const existingRow = Array.from(rosterBody.querySelectorAll('tr')).find(row => row.cells[0].textContent === name);
-
-            // If the name exists, update the row, otherwise add a new row
-            if (existingRow) {
-                existingRow.cells[1].textContent = side;
-            } else {
-                const newRow = `
-                    <tr>
-                        <td>${name}</td>
-                        <td>${side}</td>
-                        <td>${category}</td>
-                    </tr>
-                `;
-                rosterBody.innerHTML += newRow;
-
-                // 將新成員加入 memberList
-                memberList.push({ name, side, weight, category });
+        async function fetchMembers() {
+            showLoading();
+            try {
+                const response = await fetch('/api/current_members');
+                const data = await response.json();
+                const memberTableBody = document.getElementById('memberTableBody');
+                memberTableBody.innerHTML = '';
+                data.members.forEach((member, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td><input type="text" class="form-control" value="${member.name}" readonly></td>
+                        <td>
+                            <select class="form-select">
+                                <option value="Left" ${member.side === 'Left' ? 'selected' : ''}>Left</option>
+                                <option value="Right" ${member.side === 'Right' ? 'selected' : ''}>Right</option>
+                            </select>
+                        </td>
+                        <td><input type="number" class="form-control" value="${member.weight}"></td>
+                        <td>
+                            <select class="form-select">
+                                <option value="大混" ${member.category === '大混' ? 'selected' : ''}>大混</option>
+                                <option value="小混" ${member.category === '小混' ? 'selected' : ''}>小混</option>
+                            </select>
+                        </td>
+                        <td><button class="btn btn-danger" onclick="deleteMember(this, '${member.name}')">刪除</button></td>
+                    `;
+                    memberTableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching members:', error);
+            } finally {
+                hideLoading();
             }
         }
 
-        function saveRoster() {
-            // 获取 memberList 数组
-            // const memberList = []; // 从你的前端逻辑中获取 memberList
+        async function addNewMemberRow() {
+            const response = await fetch('/api/attendance');
+            const data = await response.json();
+            const allMembers = data.names;
 
-            // 将 memberList 转换为 JSON 字符串并存储到隐藏的表单元素中
-            document.getElementById('memberListInput').value = JSON.stringify(memberList);
+            const memberTableBody = document.getElementById('memberTableBody');
+            const existingMembers = Array.from(memberTableBody.querySelectorAll('input[type="text"]')).map(input => input.value);
+            const availableMembers = allMembers.filter(name => !existingMembers.includes(name));
 
-            // 發送 POST 请求到 FastAPI 的 /api/update_members 端点
-            fetch('/api/update_members', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(memberList)
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert('Member list saved successfully!');
-                } else {
-                    alert('Failed to save member list');
-                }
-            })
-            .catch(error => {
-                console.error('Error saving member list:', error);
-                alert('An error occurred while saving member list');
-            });
-        }
+            if (availableMembers.length === 0) {
+                alert('所有成員都已添加。');
+                return;
+            }
 
+            const row = document.createElement('tr');
+            const rowCount = memberTableBody.rows.length;
 
-        function addEvent() {
-            const eventName = document.getElementById('eventInput').value;
-            const specifications = Array.from(document.getElementById('specificationsSelect').selectedOptions).map(option => option.value).join(', ');
-            const eventList = document.getElementById('eventList');
-            const newEvent = `
-                <li class="list-group-item">${eventName}: ${specifications}</li>
+            row.innerHTML = `
+                <td>${rowCount + 1}</td>
+                <td>
+                    <select class="form-select">
+                        ${availableMembers.map(name => `<option value="${name}">${name}</option>`).join('')}
+                    </select>
+                </td>
+                <td>
+                    <select class="form-select">
+                        <option value="Left">Left</option>
+                        <option value="Right">Right</option>
+                    </select>
+                </td>
+                <td><input type="number" class="form-control"></td>
+                <td>
+                    <select class="form-select">
+                        <option value="大混">大混</option>
+                        <option value="小混">小混</option>
+                    </select>
+                </td>
+                <td><button class="btn btn-danger" onclick="deleteMember(this)">刪除</button></td>
             `;
-            eventList.innerHTML += newEvent;
+            memberTableBody.appendChild(row);
+            isEdited = true;
+            document.getElementById('updateMembersButton').disabled = false;
         }
 
-        function fetchCurrentMembers() {
-            fetch('/api/current_members')
-                .then(response => response.json())
-                .then(data => {
-                    const currentMembers = document.getElementById('currentMembers');
-                    currentMembers.innerHTML = ''; // Clear current members list
-                    data.members.forEach(member => {
-                        const row = `
-                            <tr>
-                                <td><button onclick="deleteMember('${member.name}')" class="btn btn-outline-danger">Delete</button></td>
-                                <td>${member.name}</td>
-                                <td>${member.side}</td>
-                                <td>${member.weight}</td>
-                                <td>${member.category}</td>
-                            </tr>
-                        `;
-                        currentMembers.innerHTML += row;
+        function deleteMember(button, name = null) {
+            const row = button.closest('tr');
+            row.remove();
+            if (name) {
+                fetch(`/api/delete_member?name=${name}`, { method: 'DELETE' })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data.message);
+                    })
+                    .catch(error => {
+                        console.error('Error deleting member:', error);
                     });
-                });
+            }
+            updateRowNumbers();
+            isEdited = true;
+            document.getElementById('updateMembersButton').disabled = false;
         }
 
-        function deleteMember(name) {
-            fetch(`/api/delete_member?name=${name}`, {
-                method: 'DELETE'
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert('Member deleted successfully!');
-                    fetchCurrentMembers(); // Refresh the current members list
-                } else {
-                    alert('Failed to delete member');
-                }
-            })
-            .catch(error => {
-                console.error('Error deleting member:', error);
-                alert('An error occurred while deleting member');
+        function updateRowNumbers() {
+            const memberTableBody = document.getElementById('memberTableBody');
+            const rows = memberTableBody.querySelectorAll('tr');
+            rows.forEach((row, index) => {
+                row.cells[0].innerText = index + 1;
             });
         }
 
-        function clearDatabase() {
-            if (confirm("確定要清除所有資料嗎？")) {
-                fetch('/api/clear_database', {
-                    method: 'DELETE'
-                })
-                .then(response => {
-                    if (response.ok) {
-                        alert('Database cleared successfully!');
-                        fetchCurrentMembers(); // Refresh the current members list
-                    } else {
-                        alert('Failed to clear database');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error clearing database:', error);
-                    alert('An error occurred while clearing database');
+        async function updateMembers() {
+            const memberTableBody = document.getElementById('memberTableBody');
+            const rows = memberTableBody.querySelectorAll('tr');
+            const members = [];
+            rows.forEach(row => {
+                const name = row.cells[1].querySelector('select') ? row.cells[1].querySelector('select').value : row.cells[1].querySelector('input').value;
+                const side = row.cells[2].querySelector('select').value;
+                const weight = row.cells[3].querySelector('input').value;
+                const category = row.cells[4].querySelector('select').value;
+                members.push({ name, side, weight, category });
+            });
+
+            showLoading();
+            try {
+                const response = await fetch('/api/update_members', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(members)
                 });
+                const data = await response.json();
+                console.log(data.message);
+                isEdited = false;
+                document.getElementById('updateMembersButton').disabled = true;
+                fetchMembers();
+            } catch (error) {
+                console.error('Error updating members:', error);
+            } finally {
+                hideLoading();
             }
         }
 
-        // Display current members on page load
-        fetchCurrentMembers();
+        async function clearDatabase() {
+            if (isEdited && !confirm("您有未保存的更改。是否繼續並清除資料庫？")) {
+                return;
+            }
+            showLoading();
+            try {
+                const response = await fetch('/api/clear_database', { method: 'DELETE' });
+                const data = await response.json();
+                console.log(data.message);
+                isEdited = false;
+                document.getElementById('updateMembersButton').disabled = true;
+                fetchMembers();
+            } catch (error) {
+                console.error('Error clearing database:', error);
+            } finally {
+                hideLoading();
+            }
+        }
 
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
     </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

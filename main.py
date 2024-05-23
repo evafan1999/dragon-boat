@@ -5,13 +5,15 @@ from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List
-from starlette.staticfiles import StaticFiles
-
 import requests
+import logging
+
+# 設置日誌
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
-
 
 def scrape_data():
     url = "https://densuke.biz/list?cd=zmeRuJKrVJvpQUJn#google_vignette"
@@ -47,8 +49,10 @@ def scrape_data():
             
             return {"dates": dates_list, "names": name_list, "attendance": att_list}
         else:
+            logger.error("Table not found on the page.")
             return {"error": "Table not found"}
     else:
+        logger.error(f"Failed to fetch data from {url}. Status code: {response.status_code}")
         return {"error": "Failed to fetch data"}
 
 class Member(BaseModel):
@@ -60,10 +64,9 @@ class Member(BaseModel):
 @app.get("/")
 async def read_root():
     return FileResponse("templates/index.html")
-    # return 
 
 @app.get("/members")
-async def read_root():
+async def read_members():
     return FileResponse("templates/members.html")
 
 @app.get("/api/attendance")
@@ -71,98 +74,86 @@ async def get_attendance():
     data = scrape_data()
     return data
 
-# 用於接收POST請求的路由
 @app.post("/api/update_members")
 async def update_members(member_list: List[Member]):
     try:
         # Connect to the SQLite database
-        conn = sqlite3.connect('mydatabase.db')
-        cursor = conn.cursor()
+        with sqlite3.connect('mydatabase.db') as conn:
+            cursor = conn.cursor()
 
-        # Create the members table if it doesn't exist
-        cursor.execute('''CREATE TABLE IF NOT EXISTS members
-                       (name TEXT, side TEXT, weight REAL, category TEXT)''')
+            # Create the members table if it doesn't exist
+            cursor.execute('''CREATE TABLE IF NOT EXISTS members
+                            (name TEXT, side TEXT, weight REAL, category TEXT)''')
 
-        # Check if each member already exists in the database
-        existing_members = {row[0] for row in cursor.execute("SELECT name FROM members")}
-        new_members = []
-        for member in member_list:
-            if member.name in existing_members:
-                # Update the existing member
-                cursor.execute("UPDATE members SET side=?, weight=?, category=? WHERE name=?",
-                               (member.side, member.weight, member.category, member.name))
-            else:
-                # Add the new member
-                new_members.append(member)
+            # Check if each member already exists in the database
+            existing_members = {row[0] for row in cursor.execute("SELECT name FROM members")}
+            new_members = []
+            for member in member_list:
+                if member.name in existing_members:
+                    # Update the existing member
+                    cursor.execute("UPDATE members SET side=?, weight=?, category=? WHERE name=?",
+                                (member.side, member.weight, member.category, member.name))
+                else:
+                    # Add the new member
+                    new_members.append(member)
 
-        # Insert new members into the database
-        cursor.executemany("INSERT INTO members (name, side, weight, category) VALUES (?, ?, ?, ?)",
-                            [(m.name, m.side, m.weight, m.category) for m in new_members])
+            # Insert new members into the database
+            cursor.executemany("INSERT INTO members (name, side, weight, category) VALUES (?, ?, ?, ?)",
+                                [(m.name, m.side, m.weight, m.category) for m in new_members])
 
-        # Commit the changes
-        conn.commit()
-
-        # Close the database connection
-        conn.close()
+            conn.commit()
 
         return {"message": "Member list updated successfully"}
     except Exception as e:
+        logger.error(f"Failed to update member list: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to update member list: {str(e)}")
 
 @app.get("/api/current_members")
 async def get_current_members():
     try:
         # 連接到SQLite數據庫
-        conn = sqlite3.connect('mydatabase.db')
-        cursor = conn.cursor()
+        with sqlite3.connect('mydatabase.db') as conn:
+            cursor = conn.cursor()
 
-        # 查詢所有成員
-        cursor.execute("SELECT name, side, weight, category FROM members")
-        members = [{"name": row[0], "side": row[1], "weight": row[2], "category": row[3]} for row in cursor.fetchall()]
-
-        # 關閉數據庫連接
-        conn.close()
+            # 查詢所有成員
+            cursor.execute("SELECT name, side, weight, category FROM members")
+            members = [{"name": row[0], "side": row[1], "weight": row[2], "category": row[3]} for row in cursor.fetchall()]
 
         return {"members": members}
     except Exception as e:
+        logger.error(f"Failed to retrieve current members: {str(e)}")
         return {"error": f"Failed to retrieve current members: {str(e)}"}
 
 @app.delete("/api/delete_member")
 async def delete_member(name: str):
     try:
         # 連接到SQLite數據庫
-        conn = sqlite3.connect('mydatabase.db')
-        cursor = conn.cursor()
+        with sqlite3.connect('mydatabase.db') as conn:
+            cursor = conn.cursor()
 
-        # 刪除指定名稱的成員
-        cursor.execute("DELETE FROM members WHERE name=?", (name,))
+            # 刪除指定名稱的成員
+            cursor.execute("DELETE FROM members WHERE name=?", (name,))
 
-        # 提交更改
-        conn.commit()
-
-        # 關閉數據庫連接
-        conn.close()
+            conn.commit()
 
         return {"message": f"Member '{name}' deleted successfully"}
     except Exception as e:
+        logger.error(f"Failed to delete member '{name}': {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to delete member '{name}': {str(e)}")
 
 @app.delete("/api/clear_database")
 async def clear_database():
     try:
         # 連接到 SQLite 數據庫
-        conn = sqlite3.connect('mydatabase.db')
-        cursor = conn.cursor()
+        with sqlite3.connect('mydatabase.db') as conn:
+            cursor = conn.cursor()
 
-        # 刪除整張表格
-        cursor.execute("DROP TABLE IF EXISTS members")
+            # 刪除整張表格
+            cursor.execute("DROP TABLE IF EXISTS members")
 
-        # 提交更改
-        conn.commit()
-
-        # 關閉數據庫連接
-        conn.close()
+            conn.commit()
 
         return {"message": "Database cleared successfully"}
     except Exception as e:
+        logger.error(f"Failed to clear database: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to clear database: {str(e)}")
