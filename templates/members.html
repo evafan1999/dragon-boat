@@ -17,28 +17,49 @@
             z-index: 9999;
             display: none;
         }
+        .form-control, .form-select {
+            margin-bottom: 10px;
+        }
+        .btn {
+            margin-bottom: 10px;
+        }
+        .table-responsive {
+            margin-top: 10px;
+        }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            .card-title {
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container mt-4">
         <h1>成員管理</h1>
-        <button class="btn btn-primary mb-3" onclick="addNewMemberRow()">新增成員</button>
-        <button class="btn btn-danger mb-3" onclick="clearDatabase()">清除資料庫</button>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>編號</th>
-                    <th>名稱</th>
-                    <th>側別</th>
-                    <th>體重</th>
-                    <th>分類</th>
-                    <th>操作</th>
-                </tr>
-            </thead>
-            <tbody id="memberTableBody">
-                <!-- 成員資料將在這裡顯示 -->
-            </tbody>
-        </table>
+        <div class="d-flex flex-wrap justify-content-between">
+            <button class="btn btn-primary" onclick="addNewMemberRow()">新增成員</button>
+            <button class="btn btn-danger" onclick="clearDatabase()">清除資料庫</button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>編號</th>
+                        <th>名稱</th>
+                        <th>側別</th>
+                        <th>體重</th>
+                        <th>分類</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="memberTableBody">
+                    <!-- 成員資料將在這裡顯示 -->
+                </tbody>
+            </table>
+        </div>
         <button class="btn btn-success" id="updateMembersButton" onclick="updateMembers()" disabled>更新成員</button>
     </div>
 
@@ -212,7 +233,7 @@
             if (isEdited && !confirm("您有未保存的更改。是否繼續並清除資料庫？")) {
                 return;
             }
-            if (!confirm("您確定要清除資料庫嗎？此操作將無法還原。")) {
+            if (!confirm("確定要清除資料庫嗎？")) {
                 return;
             }
             showLoading();
@@ -220,8 +241,6 @@
                 const response = await fetch('/api/clear_database', { method: 'DELETE' });
                 const data = await response.json();
                 console.log(data.message);
-                isEdited = false;
-                document.getElementById('updateMembersButton').disabled = true;
                 fetchMembers();
             } catch (error) {
                 console.error('Error clearing database:', error);
