@@ -11,35 +11,18 @@
         .card {
             margin: 5px 0;
         }
-        .loading-overlay {
+        #loading {
             position: fixed;
-            top: 0;
             left: 0;
+            top: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.8);
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 9999;
-            display: none;
-        }
-        .form-control, .form-select {
-            margin-bottom: 10px;
-        }
-        .btn {
-            margin-bottom: 10px;
-        }
-        .table-responsive {
-            margin-top: 10px;
-        }
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 1.5rem;
-            }
-            .card-title {
-                font-size: 1rem;
-            }
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 1000;
+            font-size: 2em;
         }
     </style>
 </head>
@@ -49,15 +32,15 @@
         <div class="row align-items-end">
             <div class="col-12 col-md-6">
                 <label for="selectDate" class="form-label">Select Date:</label>
-                <select id="selectDate" class="form-select"></select>
+                <select id="selectDate" class="form-select" onchange="onDateChange()"></select>
             </div>
             <div class="col-12 col-md-6">
                 <button onclick="getAttendance()" class="btn" style="margin-top: 10px; background-color: black; color: white;">Show Attendance</button>
             </div>
         </div>
-        <div class="table-responsive" style="margin-top: 10px;">
+        <div class="container" style="margin-top: 10px;">
             <div class="row">
-                <div class="col-sm-12 col-md-6" id="bigDragonTableContainer">
+                <div class="col-sm" id="bigDragonTableContainer">
                     <table class="table table-sm">
                         <caption class="caption-top">大龍</caption>
                         <thead>
@@ -85,7 +68,7 @@
                         </tbody>
                     </table>
                 </div>    
-                <div class="col-sm-12 col-md-6" id="smallDragonTableContainer">
+                <div class="col-sm" id="smallDragonTableContainer">
                     <table class="table table-sm">
                         <caption class="caption-top">小龍</caption>
                         <thead>
@@ -112,20 +95,25 @@
             </div>
         </div>
         <div class="container mt-3">
+            <!-- <button onclick="window.location.href='/members'" class="btn" style="margin-bottom: 10px; background-color: black; color: white;">Member Management</button> -->
             <button onclick="exportTableToImage('bigDragonTableContainer', '大龍')" class="btn" style="margin-bottom: 10px; background-color: green; color: white;">Print Big Dragon</button>
             <button onclick="exportTableToImage('smallDragonTableContainer', '小龍')" class="btn" style="margin-bottom: 10px; background-color: blue; color: white;">Print Small Dragon</button>
         </div>
         <h4 style="padding: 10px;">今日出席人員</h4>
         <div id="attendanceList" class="mt-3"></div>
-        <div id="loading" class="loading-overlay">Loading...</div>
+        <div id="loading" style="display:none;">Loading...</div>
     </div>
     <div class="container mt-3">
         <button onclick="window.location.href='/members'" class="btn" style="margin-bottom: 10px; background-color: black; color: white;">Member Management</button>
     </div>
     <script>
+        let currentDate = null;
+
         async function getAttendance() {
-            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('loading').style.display = 'block';
             const selectDate = document.getElementById('selectDate').value;
+            saveState(currentDate);
+            currentDate = selectDate;
             const response = await fetch('/api/attendance');
             const data = await response.json();
 
@@ -190,9 +178,7 @@
             }
             populateHelmsmanOptions('small_helmsman', allPresentMembers, allAbsentMembers);
 
-            calculateWeights();
-
-            disableSelectedOptions();
+            loadState(selectDate);
 
             document.getElementById('loading').style.display = 'none';
         }
@@ -393,6 +379,42 @@
                 option.value = date;
                 selectDate.appendChild(option);
             });
+            // 確保日期選擇變更處理器僅設置一次
+            selectDate.addEventListener('change', onDateChange);
+        }
+
+        function onDateChange() {
+            const selectDate = document.getElementById('selectDate').value;
+            if (selectDate !== currentDate) {
+                getAttendance();
+            }
+        }
+
+        function saveState(date) {
+            if (!date) return;
+            const state = {
+                left: {},
+                right: {},
+                helmsman: {}
+            };
+            for (let i = 1; i <= 12; i++) {
+                state.left[`left_${i}`] = document.getElementById(`left_${i}`).value;
+                state.right[`right_${i}`] = document.getElementById(`right_${i}`).value;
+            }
+            state.helmsman['left_helmsman'] = document.getElementById('left_helmsman').value;
+
+            localStorage.setItem(date, JSON.stringify(state));
+        }
+
+        function loadState(date) {
+            const state = JSON.parse(localStorage.getItem(date));
+            if (!state) return;
+            for (let i = 1; i <= 12; i++) {
+                document.getElementById(`left_${i}`).value = state.left[`left_${i}`] || '';
+                document.getElementById(`right_${i}`).value = state.right[`right_${i}`] || '';
+            }
+            document.getElementById('left_helmsman').value = state.helmsman['left_helmsman'] || '';
+            calculateWeights();
         }
 
         // Export table to image
