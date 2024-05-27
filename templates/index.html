@@ -90,14 +90,13 @@
                             <tr><td>7</td><td><select class="form-select" id="small_left_7"></select></td><td><select class="form-select" id="small_right_7"></select></td></tr>
                             <tr><td>8</td><td><select class="form-select" id="small_left_8"></select></td><td><select class="form-select" id="small_right_8"></select></td></tr>
                             <tr><td>舵手</td><td><select class="form-select" id="small_helmsman"></select></td><td></td></tr>
-                            <tr><td>重量</td><td id="smallLeftWeight">0</td><td id="smallRightWeight">0</td></tr>
+                            <tr><td>重量</td><td id="smallLeftWeight">0</td><td id="smallRightWeight">0"></td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
         <div class="container mt-3">
-            <!-- <button onclick="window.location.href='/members'" class="btn" style="margin-bottom: 10px; background-color: black; color: white;">Member Management</button> -->
             <button onclick="exportTableToImage('bigDragonTableContainer', '大龍')" class="btn" style="margin-bottom: 10px; background-color: green; color: white;">Print Big Dragon</button>
             <button onclick="exportTableToImage('smallDragonTableContainer', '小龍')" class="btn" style="margin-bottom: 10px; background-color: blue; color: white;">Print Small Dragon</button>
         </div>
@@ -116,79 +115,84 @@
             const selectDate = document.getElementById('selectDate').value;
             saveState(currentDate);
             currentDate = selectDate;
-            const response = await fetch('/api/attendance');
-            const data = await response.json();
 
-            const dates = data.dates;
-            const index = dates.indexOf(selectDate);
-            const names = data.names;
-            const attendance = data.attendance[index];
+            try {
+                const response = await fetch('/api/attendance');
+                const data = await response.json();
 
-            const attendanceList = document.getElementById('attendanceList');
-            attendanceList.innerHTML = ''; // Clear previous list
+                const dates = data.dates;
+                const index = dates.indexOf(selectDate);
+                const names = data.names;
+                const attendance = data.attendance[index];
 
-            const rowDiv = document.createElement('div');
-            rowDiv.className = 'row';
+                const attendanceList = document.getElementById('attendanceList');
+                attendanceList.innerHTML = ''; // Clear previous list
 
-            names.forEach((name, i) => {
-                if (attendance[i] === '○') {
-                    const cardCol = document.createElement('div');
-                    cardCol.className = 'col-6 col-md-2'; // Bootstrap column for responsiveness
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.innerHTML = `
-                        <div class="card-body">
-                            <h5 class="card-title">${name}</h5>
-                        </div>
-                    `;
-                    cardCol.appendChild(card);
-                    rowDiv.appendChild(cardCol);
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'row';
+
+                names.forEach((name, i) => {
+                    if (attendance[i] === '○') {
+                        const cardCol = document.createElement('div');
+                        cardCol.className = 'col-6 col-md-2'; // Bootstrap column for responsiveness
+                        const card = document.createElement('div');
+                        card.className = 'card';
+                        card.innerHTML = `
+                            <div class="card-body">
+                                <h5 class="card-title">${name}</h5>
+                            </div>
+                        `;
+                        cardCol.appendChild(card);
+                        rowDiv.appendChild(cardCol);
+                    }
+                });
+
+                attendanceList.appendChild(rowDiv);
+
+                const membersResponse = await fetch('/api/current_members');
+                const membersData = await membersResponse.json();
+
+                const allMembers = membersData.members;
+                const bigDragonLeftMembers = membersData.members.filter(member => member.category === '大混' && member.side === 'Left' && attendance[names.indexOf(member.name)] === '○');
+                const bigDragonRightMembers = membersData.members.filter(member => member.category === '大混' && member.side === 'Right' && attendance[names.indexOf(member.name)] === '○');
+                const smallDragonLeftMembers = membersData.members.filter(member => member.category === '小混' && member.side === 'Left' && attendance[names.indexOf(member.name)] === '○');
+                const smallDragonRightMembers = membersData.members.filter(member => member.category === '小混' && member.side === 'Right' && attendance[names.indexOf(member.name)] === '○');
+
+                // 所有今日出席的隊員
+                const allPresentMembers = membersData.members.filter(member => attendance[names.indexOf(member.name)] === '○');
+                // 所有不在今日出席名單中的隊員
+                const allAbsentMembers = membersData.members.filter(member => attendance[names.indexOf(member.name)] !== '○');
+
+                console.log('Big Dragon Left:', bigDragonLeftMembers);
+                console.log('Big Dragon Right:', bigDragonRightMembers);
+                console.log('Small Dragon Left:', smallDragonLeftMembers);
+                console.log('Small Dragon Right:', smallDragonRightMembers);
+                console.log('All Present Members:', allPresentMembers);
+                console.log('All Absent Members:', allAbsentMembers);
+
+                // Populate paddler options for 大龍
+                populateSpecialOptions('left_0', 'right_0', allPresentMembers, allAbsentMembers);
+                for (let i = 1; i <= 12; i++) {
+                    populateOptions('left_' + i, 'right_' + i, bigDragonLeftMembers, bigDragonRightMembers, smallDragonLeftMembers, smallDragonRightMembers, allAbsentMembers);
                 }
-            });
+                populateHelmsmanOptions('left_helmsman', allPresentMembers, allAbsentMembers);
 
-            attendanceList.appendChild(rowDiv);
+                // Populate paddler options for 小龍
+                populateSpecialOptions('small_left_0', 'small_right_0', allPresentMembers, allAbsentMembers);
+                for (let i = 1; i <= 8; i++) {
+                    populateOptions('small_left_' + i, 'small_right_' + i, bigDragonLeftMembers, bigDragonRightMembers, smallDragonLeftMembers, smallDragonRightMembers, allAbsentMembers);
+                }
+                populateHelmsmanOptions('small_helmsman', allPresentMembers, allAbsentMembers);
 
-            const membersResponse = await fetch('/api/current_members');
-            const membersData = await membersResponse.json();
-
-            const allMembers = membersData.members;
-            const bigDragonLeftMembers = membersData.members.filter(member => member.category === '大混' && member.side === 'Left' && attendance[names.indexOf(member.name)] === '○');
-            const bigDragonRightMembers = membersData.members.filter(member => member.category === '大混' && member.side === 'Right' && attendance[names.indexOf(member.name)] === '○');
-            const smallDragonLeftMembers = membersData.members.filter(member => member.category === '小混' && member.side === 'Left' && attendance[names.indexOf(member.name)] === '○');
-            const smallDragonRightMembers = membersData.members.filter(member => member.category === '小混' && member.side === 'Right' && attendance[names.indexOf(member.name)] === '○');
-
-            // 所有今日出席的隊員
-            const allPresentMembers = membersData.members.filter(member => attendance[names.indexOf(member.name)] === '○');
-            // 所有不在今日出席名單中的隊員
-            const allAbsentMembers = membersData.members.filter(member => attendance[names.indexOf(member.name)] !== '○');
-
-            console.log('Big Dragon Left:', bigDragonLeftMembers);
-            console.log('Big Dragon Right:', bigDragonRightMembers);
-            console.log('Small Dragon Left:', smallDragonLeftMembers);
-            console.log('Small Dragon Right:', smallDragonRightMembers);
-            console.log('All Present Members:', allPresentMembers);
-            console.log('All Absent Members:', allAbsentMembers);
-
-            // Populate paddler options for 大龍
-            populateAllOptions('left_0', 'right_0', allMembers);
-            for (let i = 1; i <= 12; i++) {
-                populateOptions('left_' + i, 'right_' + i, bigDragonLeftMembers, bigDragonRightMembers, smallDragonLeftMembers, smallDragonRightMembers, allAbsentMembers);
+                loadState(selectDate);
+            } catch (error) {
+                console.error('Error fetching attendance data:', error);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
             }
-            populateHelmsmanOptions('left_helmsman', allPresentMembers, allAbsentMembers);
-
-            // Populate paddler options for 小龍
-            populateAllOptions('small_left_0', 'small_right_0', allMembers);
-            for (let i = 1; i <= 8; i++) {
-                populateOptions('small_left_' + i, 'small_right_' + i, bigDragonLeftMembers, bigDragonRightMembers, smallDragonLeftMembers, smallDragonRightMembers, allAbsentMembers);
-            }
-            populateHelmsmanOptions('small_helmsman', allPresentMembers, allAbsentMembers);
-
-            loadState(selectDate);
-
-            document.getElementById('loading').style.display = 'none';
         }
 
-        function populateAllOptions(leftId, rightId, allMembers) {
+        function populateSpecialOptions(leftId, rightId, allPresentMembers, allAbsentMembers) {
             const selectLeft = document.getElementById(leftId);
             const selectRight = document.getElementById(rightId);
             selectLeft.innerHTML = '';
@@ -200,13 +204,38 @@
             selectLeft.appendChild(emptyOption.cloneNode(true));
             selectRight.appendChild(emptyOption.cloneNode(true));
 
-            allMembers.forEach(member => {
+            const optgroupPresentLeft = document.createElement('optgroup');
+            optgroupPresentLeft.label = '今日出席';
+            selectLeft.appendChild(optgroupPresentLeft);
+
+            const optgroupAbsentLeft = document.createElement('optgroup');
+            optgroupAbsentLeft.label = '未登記出席';
+            selectLeft.appendChild(optgroupAbsentLeft);
+
+            const optgroupPresentRight = document.createElement('optgroup');
+            optgroupPresentRight.label = '今日出席';
+            selectRight.appendChild(optgroupPresentRight);
+
+            const optgroupAbsentRight = document.createElement('optgroup');
+            optgroupAbsentRight.label = '未登記出席';
+            selectRight.appendChild(optgroupAbsentRight);
+
+            allPresentMembers.forEach(member => {
                 const option = document.createElement('option');
                 option.text = member.name;
                 option.value = member.name;
                 option.dataset.weight = member.weight;
-                selectLeft.appendChild(option.cloneNode(true));
-                selectRight.appendChild(option.cloneNode(true));
+                optgroupPresentLeft.appendChild(option.cloneNode(true));
+                optgroupPresentRight.appendChild(option.cloneNode(true));
+            });
+
+            allAbsentMembers.forEach(member => {
+                const option = document.createElement('option');
+                option.text = member.name;
+                option.value = member.name;
+                option.dataset.weight = member.weight;
+                optgroupAbsentLeft.appendChild(option.cloneNode(true));
+                optgroupAbsentRight.appendChild(option.cloneNode(true));
             });
 
             selectLeft.addEventListener('change', disableSelectedOptions);
@@ -244,11 +273,11 @@
             selectRight.appendChild(optgroupSmallRight);
 
             const optgroupOthersLeft = document.createElement('optgroup');
-            optgroupOthersLeft.label = '其他';
+            optgroupOthersLeft.label = '未登記出席';
             selectLeft.appendChild(optgroupOthersLeft);
 
             const optgroupOthersRight = document.createElement('optgroup');
-            optgroupOthersRight.label = '其他';
+            optgroupOthersRight.label = '未登記出席';
             selectRight.appendChild(optgroupOthersRight);
 
             bigDragonLeftMembers.forEach(member => {
@@ -312,7 +341,7 @@
             selectHelmsman.appendChild(optgroupPresent);
 
             const optgroupAbsent = document.createElement('optgroup');
-            optgroupAbsent.label = '未登記';
+            optgroupAbsent.label = '未登記出席';
             selectHelmsman.appendChild(optgroupAbsent);
 
             allPresentMembers.forEach(member => {
