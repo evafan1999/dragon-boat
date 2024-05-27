@@ -64,11 +64,12 @@
                             <tr><td>10</td><td><select class="form-select" id="left_10"></select></td><td><select class="form-select" id="right_10"></select></td></tr>
                             <tr><td>11</td><td><select class="form-select" id="left_11"></select></td><td><select class="form-select" id="right_11"></select></td></tr>
                             <tr><td>12</td><td><select class="form-select" id="left_12"></select></td><td><select class="form-select" id="right_12"></select></td></tr>
-                            <tr><td>舵手</td><td><select class="form-select" id="left_helmsman"></select></td><td></td></tr>
+                            <tr><td>舵手</td><td><select class="form-select" id="left_helmsman"></select></td><td><button onclick="clearTable('bigDragonTableContainer')" class="btn btn-warning" style="margin-bottom: 10px;">Clear Big Dragon</button></td></tr>
                             <tr><td>重量</td><td id="leftWeight">0</td><td id="rightWeight">0</td></tr>
                         </tbody>
                     </table>
-                </div>    
+                </div>
+                
                 <div class="col-sm" id="smallDragonTableContainer">
                     <table class="table table-sm">
                         <caption class="caption-top">小龍</caption>
@@ -89,8 +90,8 @@
                             <tr><td>6</td><td><select class="form-select" id="small_left_6"></select></td><td><select class="form-select" id="small_right_6"></select></td></tr>
                             <tr><td>7</td><td><select class="form-select" id="small_left_7"></select></td><td><select class="form-select" id="small_right_7"></select></td></tr>
                             <tr><td>8</td><td><select class="form-select" id="small_left_8"></select></td><td><select class="form-select" id="small_right_8"></select></td></tr>
-                            <tr><td>舵手</td><td><select class="form-select" id="small_helmsman"></select></td><td></td></tr>
-                            <tr><td>重量</td><td id="smallLeftWeight">0</td><td id="smallRightWeight">0"></td></tr>
+                            <tr><td>舵手</td><td><select class="form-select" id="small_helmsman"></select></td><td><button onclick="clearTable('smallDragonTableContainer')" class="btn btn-warning" style="margin-bottom: 10px;">Clear Small Dragon</button></td></tr>
+                            <tr><td>重量</td><td id="smallLeftWeight">0</td><td id="smallRightWeight">0</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -477,6 +478,18 @@
             document.getElementById('left_helmsman').value = state.helmsman['left_helmsman'] || '';
             calculateWeights();
             disableSelectedOptions(); // 確保在加載狀態時禁用選項
+        }
+
+        function clearTable(containerId) {
+            if (confirm("確定要清空目前的名單嗎？")) {
+                const container = document.getElementById(containerId);
+                const selects = container.querySelectorAll('select');
+                selects.forEach(select => {
+                    select.value = '';
+                });
+                calculateWeights();
+                disableSelectedOptions();
+            }
         }
 
         // Export table to image

@@ -33,6 +33,30 @@
             .card-title {
                 font-size: 1rem;
             }
+            .table th, .table td {
+                white-space: nowrap;
+            }
+            .table thead {
+                display: none;
+            }
+            .table tr {
+                display: flex;
+                flex-direction: column;
+                margin-bottom: 10px;
+                border-bottom: 2px solid #ddd;
+            }
+            .table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px;
+            }
+            .table td::before {
+                content: attr(data-label);
+                flex-basis: 50%;
+                text-align: left;
+                font-weight: bold;
+            }
         }
     </style>
 </head>
@@ -61,6 +85,7 @@
             </table>
         </div>
         <button class="btn btn-success" id="updateMembersButton" onclick="updateMembers()" disabled>更新成員</button>
+        <button class="btn btn-primary" onclick="location.href = '/';">返回</button>
     </div>
 
     <div class="loading-overlay" id="loadingOverlay">
@@ -100,22 +125,22 @@
                 data.members.forEach((member, index) => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${index + 1}</td>
-                        <td><input type="text" class="form-control" value="${member.name}" readonly></td>
-                        <td>
+                        <td data-label="編號">${index + 1}</td>
+                        <td data-label="名稱"><input type="text" class="form-control" value="${member.name}" readonly></td>
+                        <td data-label="側別">
                             <select class="form-select">
                                 <option value="Left" ${member.side === 'Left' ? 'selected' : ''}>Left</option>
                                 <option value="Right" ${member.side === 'Right' ? 'selected' : ''}>Right</option>
                             </select>
                         </td>
-                        <td><input type="number" class="form-control" value="${member.weight}"></td>
-                        <td>
+                        <td data-label="體重"><input type="number" class="form-control" value="${member.weight}"></td>
+                        <td data-label="分類">
                             <select class="form-select">
                                 <option value="大混" ${member.category === '大混' ? 'selected' : ''}>大混</option>
                                 <option value="小混" ${member.category === '小混' ? 'selected' : ''}>小混</option>
                             </select>
                         </td>
-                        <td><button class="btn btn-danger" onclick="deleteMember(this, '${member.name}')">刪除</button></td>
+                        <td data-label="操作"><button class="btn btn-danger" onclick="deleteMember(this, '${member.name}')">刪除</button></td>
                     `;
                     memberTableBody.appendChild(row);
                 });
@@ -144,26 +169,26 @@
             const rowCount = memberTableBody.rows.length;
 
             row.innerHTML = `
-                <td>${rowCount + 1}</td>
-                <td>
+                <td data-label="編號">${rowCount + 1}</td>
+                <td data-label="名稱">
                     <select class="form-select">
                         ${availableMembers.map(name => `<option value="${name}">${name}</option>`).join('')}
                     </select>
                 </td>
-                <td>
+                <td data-label="側別">
                     <select class="form-select">
                         <option value="Left">Left</option>
                         <option value="Right">Right</option>
                     </select>
                 </td>
-                <td><input type="number" class="form-control"></td>
-                <td>
+                <td data-label="體重"><input type="number" class="form-control"></td>
+                <td data-label="分類">
                     <select class="form-select">
                         <option value="大混">大混</option>
                         <option value="小混">小混</option>
                     </select>
                 </td>
-                <td><button class="btn btn-danger" onclick="deleteMember(this)">刪除</button></td>
+                <td data-label="操作"><button class="btn btn-danger" onclick="deleteMember(this)">刪除</button></td>
             `;
             memberTableBody.appendChild(row);
             isEdited = true;
