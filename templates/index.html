@@ -51,6 +51,7 @@
                             </tr>
                         </thead>
                         <tbody id="paddleTableBody">
+                            <tr><td>0</td><td><select class="form-select" id="left_0"></select></td><td><select class="form-select" id="right_0"></select></td></tr>
                             <tr><td>1</td><td><select class="form-select" id="left_1"></select></td><td><select class="form-select" id="right_1"></select></td></tr>
                             <tr><td>2</td><td><select class="form-select" id="left_2"></select></td><td><select class="form-select" id="right_2"></select></td></tr>
                             <tr><td>3</td><td><select class="form-select" id="left_3"></select></td><td><select class="form-select" id="right_3"></select></td></tr>
@@ -79,6 +80,7 @@
                             </tr>
                         </thead>
                         <tbody id="smallPaddleTableBody"> 
+                            <tr><td>0</td><td><select class="form-select" id="small_left_0"></select></td><td><select class="form-select" id="small_right_0"></select></td></tr>
                             <tr><td>1</td><td><select class="form-select" id="small_left_1"></select></td><td><select class="form-select" id="small_right_1"></select></td></tr>
                             <tr><td>2</td><td><select class="form-select" id="small_left_2"></select></td><td><select class="form-select" id="small_right_2"></select></td></tr>
                             <tr><td>3</td><td><select class="form-select" id="small_left_3"></select></td><td><select class="form-select" id="small_right_3"></select></td></tr>
@@ -149,6 +151,7 @@
             const membersResponse = await fetch('/api/current_members');
             const membersData = await membersResponse.json();
 
+            const allMembers = membersData.members;
             const bigDragonLeftMembers = membersData.members.filter(member => member.category === '大混' && member.side === 'Left' && attendance[names.indexOf(member.name)] === '○');
             const bigDragonRightMembers = membersData.members.filter(member => member.category === '大混' && member.side === 'Right' && attendance[names.indexOf(member.name)] === '○');
             const smallDragonLeftMembers = membersData.members.filter(member => member.category === '小混' && member.side === 'Left' && attendance[names.indexOf(member.name)] === '○');
@@ -167,12 +170,14 @@
             console.log('All Absent Members:', allAbsentMembers);
 
             // Populate paddler options for 大龍
+            populateAllOptions('left_0', 'right_0', allMembers);
             for (let i = 1; i <= 12; i++) {
                 populateOptions('left_' + i, 'right_' + i, bigDragonLeftMembers, bigDragonRightMembers, smallDragonLeftMembers, smallDragonRightMembers, allAbsentMembers);
             }
             populateHelmsmanOptions('left_helmsman', allPresentMembers, allAbsentMembers);
 
             // Populate paddler options for 小龍
+            populateAllOptions('small_left_0', 'small_right_0', allMembers);
             for (let i = 1; i <= 8; i++) {
                 populateOptions('small_left_' + i, 'small_right_' + i, bigDragonLeftMembers, bigDragonRightMembers, smallDragonLeftMembers, smallDragonRightMembers, allAbsentMembers);
             }
@@ -181,6 +186,33 @@
             loadState(selectDate);
 
             document.getElementById('loading').style.display = 'none';
+        }
+
+        function populateAllOptions(leftId, rightId, allMembers) {
+            const selectLeft = document.getElementById(leftId);
+            const selectRight = document.getElementById(rightId);
+            selectLeft.innerHTML = '';
+            selectRight.innerHTML = '';
+
+            const emptyOption = document.createElement('option');
+            emptyOption.text = '';
+            emptyOption.value = '';
+            selectLeft.appendChild(emptyOption.cloneNode(true));
+            selectRight.appendChild(emptyOption.cloneNode(true));
+
+            allMembers.forEach(member => {
+                const option = document.createElement('option');
+                option.text = member.name;
+                option.value = member.name;
+                option.dataset.weight = member.weight;
+                selectLeft.appendChild(option.cloneNode(true));
+                selectRight.appendChild(option.cloneNode(true));
+            });
+
+            selectLeft.addEventListener('change', disableSelectedOptions);
+            selectRight.addEventListener('change', disableSelectedOptions);
+            selectLeft.addEventListener('change', calculateWeights);
+            selectRight.addEventListener('change', calculateWeights);
         }
 
         function populateOptions(leftId, rightId, bigDragonLeftMembers, bigDragonRightMembers, smallDragonLeftMembers, smallDragonRightMembers, allAbsentMembers) {
@@ -397,7 +429,7 @@
                 right: {},
                 helmsman: {}
             };
-            for (let i = 1; i <= 12; i++) {
+            for (let i = 0; i <= 12; i++) {
                 state.left[`left_${i}`] = document.getElementById(`left_${i}`).value;
                 state.right[`right_${i}`] = document.getElementById(`right_${i}`).value;
             }
@@ -409,12 +441,13 @@
         function loadState(date) {
             const state = JSON.parse(localStorage.getItem(date));
             if (!state) return;
-            for (let i = 1; i <= 12; i++) {
+            for (let i = 0; i <= 12; i++) {
                 document.getElementById(`left_${i}`).value = state.left[`left_${i}`] || '';
                 document.getElementById(`right_${i}`).value = state.right[`right_${i}`] || '';
             }
             document.getElementById('left_helmsman').value = state.helmsman['left_helmsman'] || '';
             calculateWeights();
+            disableSelectedOptions(); // 確保在加載狀態時禁用選項
         }
 
         // Export table to image
