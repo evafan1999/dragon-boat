@@ -64,8 +64,8 @@
     <div class="container mt-4">
         <h1>成員管理</h1>
         <div class="d-flex flex-wrap justify-content-between">
-            <button class="btn btn-primary" onclick="addNewMemberRow()">新增成員</button>
-            <button class="btn btn-danger" onclick="clearDatabase()">清除資料庫</button>
+            <button class="btn" onclick="addNewMemberRow()" style="margin-bottom: 10px; background-color: #33312E; color: #E0E2DB;">新增成員</button>
+            <button class="btn" onclick="clearDatabase()" style="margin-bottom: 10px; background-color: #D2D4C8; color: #33312e;">清除資料庫</button>
         </div>
         <div class="table-responsive">
             <table class="table table-bordered">
@@ -85,7 +85,7 @@
             </table>
         </div>
         <button class="btn btn-success" id="updateMembersButton" onclick="updateMembers()" disabled>更新成員</button>
-        <button class="btn btn-primary" onclick="location.href = '/';">返回</button>
+        <button class="btn" onclick="location.href = '/';" style="margin-bottom: 10px; background-color: #33312E; color: #E0E2DB;">返回出席表</button>
     </div>
 
     <div class="loading-overlay" id="loadingOverlay">
