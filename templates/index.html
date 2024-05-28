@@ -35,14 +35,14 @@
                 <select id="selectDate" class="form-select" onchange="onDateChange()"></select>
             </div>
             <div class="col-12 col-md-6">
-                <button onclick="getAttendance()" class="btn" style="margin-top: 10px; background-color: black; color: white;">Show Attendance</button>
+                <!-- <button onclick="getAttendance()" class="btn" style="margin-top: 10px; background-color: black; color: white;">Show Attendance</button> -->
             </div>
         </div>
         <div class="container" style="margin-top: 10px;">
             <div class="row">
                 <div class="col-sm" id="bigDragonTableContainer">
                     <table class="table table-sm">
-                        <caption class="caption-top">大龍</caption>
+                        <caption class="caption-top">大龍 <span id="bigDragonDate"></span></caption>
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
@@ -64,15 +64,17 @@
                             <tr><td>10</td><td><select class="form-select" id="left_10"></select></td><td><select class="form-select" id="right_10"></select></td></tr>
                             <tr><td>11</td><td><select class="form-select" id="left_11"></select></td><td><select class="form-select" id="right_11"></select></td></tr>
                             <tr><td>12</td><td><select class="form-select" id="left_12"></select></td><td><select class="form-select" id="right_12"></select></td></tr>
-                            <tr><td>舵手</td><td><select class="form-select" id="left_helmsman"></select></td><td><button onclick="clearTable('bigDragonTableContainer')" class="btn btn-warning" style="margin-bottom: 10px;">Clear Big Dragon</button></td></tr>
+                            <tr><td>舵手</td><td><select class="form-select" id="left_helmsman"></select></td><td></td></tr>
                             <tr><td>重量</td><td id="leftWeight">0</td><td id="rightWeight">0</td></tr>
                         </tbody>
                     </table>
+                    <button onclick="clearTable('bigDragonTableContainer')" class="btn" style="margin-bottom: 10px; background-color: #33312E; color: #E0E2DB;">清除表格</button>
+                    <button onclick="exportTableToImage('bigDragonTableContainer', '大龍')" class="btn" style="margin-bottom: 10px; background-color: #b8bdb5; color: #33312e;">Print Big Dragon</button>
                 </div>
                 
                 <div class="col-sm" id="smallDragonTableContainer">
                     <table class="table table-sm">
-                        <caption class="caption-top">小龍</caption>
+                        <caption class="caption-top">小龍 <span id="smallDragonDate"></span></caption>
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
@@ -90,23 +92,25 @@
                             <tr><td>6</td><td><select class="form-select" id="small_left_6"></select></td><td><select class="form-select" id="small_right_6"></select></td></tr>
                             <tr><td>7</td><td><select class="form-select" id="small_left_7"></select></td><td><select class="form-select" id="small_right_7"></select></td></tr>
                             <tr><td>8</td><td><select class="form-select" id="small_left_8"></select></td><td><select class="form-select" id="small_right_8"></select></td></tr>
-                            <tr><td>舵手</td><td><select class="form-select" id="small_helmsman"></select></td><td><button onclick="clearTable('smallDragonTableContainer')" class="btn btn-warning" style="margin-bottom: 10px;">Clear Small Dragon</button></td></tr>
+                            <tr><td>舵手</td><td><select class="form-select" id="small_helmsman"></select></td><td></td></tr>
                             <tr><td>重量</td><td id="smallLeftWeight">0</td><td id="smallRightWeight">0</td></tr>
                         </tbody>
                     </table>
+                    <button onclick="clearTable('smallDragonTableContainer')" class="btn" style="margin-bottom: 10px; background-color: #33312E; color: #E0E2DB;">清除表格</button>
+                    <button onclick="exportTableToImage('smallDragonTableContainer', '小龍')" class="btn" style="margin-bottom: 10px; background-color: #D2D4C8; color: #33312e;">Print Small Dragon</button>
                 </div>
             </div>
         </div>
-        <div class="container mt-3">
+        <!-- <div class="container mt-3">
             <button onclick="exportTableToImage('bigDragonTableContainer', '大龍')" class="btn" style="margin-bottom: 10px; background-color: green; color: white;">Print Big Dragon</button>
             <button onclick="exportTableToImage('smallDragonTableContainer', '小龍')" class="btn" style="margin-bottom: 10px; background-color: blue; color: white;">Print Small Dragon</button>
-        </div>
+        </div> -->
         <h4 style="padding: 10px;">今日出席人員</h4>
         <div id="attendanceList" class="mt-3"></div>
         <div id="loading" style="display:none;">Loading...</div>
     </div>
     <div class="container mt-3">
-        <button onclick="window.location.href='/members'" class="btn" style="margin-bottom: 10px; background-color: black; color: white;">Member Management</button>
+        <button onclick="window.location.href='/members'" class="btn" style="background-color: #33312E; color: #E0E2DB;">Member Management</button>
     </div>
     <script>
         let currentDate = null;
@@ -184,6 +188,10 @@
                     populateOptions('small_left_' + i, 'small_right_' + i, bigDragonLeftMembers, bigDragonRightMembers, smallDragonLeftMembers, smallDragonRightMembers, allAbsentMembers);
                 }
                 populateHelmsmanOptions('small_helmsman', allPresentMembers, allAbsentMembers);
+
+                // 更新表格的caption中的日期
+                document.getElementById('bigDragonDate').textContent = `(${selectDate})`;
+                document.getElementById('smallDragonDate').textContent = `(${selectDate})`;
 
                 loadState(selectDate);
             } catch (error) {
