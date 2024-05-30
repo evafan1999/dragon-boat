@@ -157,3 +157,25 @@ async def clear_database():
     except Exception as e:
         logger.error(f"Failed to clear database: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to clear database: {str(e)}")
+    
+@app.post("/api/add_member")
+async def add_member(member: Member):
+    try:
+        # 連接到SQLite數據庫
+        with sqlite3.connect('mydatabase.db') as conn:
+            cursor = conn.cursor()
+
+            # 檢查成員是否已存在
+            cursor.execute("SELECT * FROM members WHERE name=?", (member.name,))
+            if cursor.fetchone():
+                raise HTTPException(status_code=400, detail="Member already exists")
+
+            # 添加新成員
+            cursor.execute("INSERT INTO members (name, side, weight, category) VALUES (?, ?, ?, ?)",
+                            (member.name, member.side, member.weight, member.category))
+            conn.commit()
+
+        return {"message": "New member added successfully"}
+    except Exception as e:
+        logger.error(f"Failed to add new member: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to add new member: {str(e)}")
