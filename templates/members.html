@@ -63,7 +63,6 @@
             padding: 10px 0;
         }
         footer .text-center {
-            /* background-color: #00000033; */
             padding: 10px 0;
         }
         footer p {
@@ -96,8 +95,38 @@
                 </tbody>
             </table>
         </div>
-        <button class="btn btn-success" id="updateMembersButton" onclick="updateMembers()" disabled>更新成員</button>
+        <button class="btn" id="updateMembersButton" onclick="updateMembers()" style="margin-bottom: 10px; background-color: #D2D4C8; color: #33312e;" disabled>儲存</button>
         <button class="btn" onclick="location.href = '/';" style="margin-bottom: 10px; background-color: #33312E; color: #E0E2DB;">返回出席表</button>
+    </div>
+
+    <!-- 新成員輸入表單 -->
+    <div class="container mt-4">
+        <h2>手動新增成員</h2>
+        <form id="newMemberForm" onsubmit="return addNewMember(event)">
+            <div class="mb-3">
+                <label for="newMemberName" class="form-label">名稱</label>
+                <input type="text" class="form-control" id="newMemberName" required>
+            </div>
+            <div class="mb-3">
+                <label for="newMemberSide" class="form-label">側別</label>
+                <select class="form-select" id="newMemberSide" required>
+                    <option value="Left">Left</option>
+                    <option value="Right">Right</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="newMemberWeight" class="form-label">體重</label>
+                <input type="number" class="form-control" id="newMemberWeight" required>
+            </div>
+            <div class="mb-3">
+                <label for="newMemberCategory" class="form-label">分類</label>
+                <select class="form-select" id="newMemberCategory" required>
+                    <option value="大混">大混</option>
+                    <option value="小混">小混</option>
+                </select>
+            </div>
+            <button type="submit" class="btn" style="background-color: #33312E; color: #E0E2DB;">新增成員</button>
+        </form>
     </div>
 
     <div class="loading-overlay" id="loadingOverlay">
@@ -209,6 +238,36 @@
             memberTableBody.appendChild(row);
             isEdited = true;
             document.getElementById('updateMembersButton').disabled = false;
+        }
+
+        async function addNewMember(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('newMemberName').value;
+            const side = document.getElementById('newMemberSide').value;
+            const weight = document.getElementById('newMemberWeight').value;
+            const category = document.getElementById('newMemberCategory').value;
+
+            const newMember = { name, side, weight, category };
+
+            showLoading();
+            try {
+                const response = await fetch('/api/add_member', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newMember)
+                });
+                const data = await response.json();
+                console.log(data.message);
+                fetchMembers();
+            } catch (error) {
+                console.error('Error adding new member:', error);
+            } finally {
+                hideLoading();
+                document.getElementById('newMemberForm').reset();
+            }
         }
 
         function deleteMember(button, name = null) {
