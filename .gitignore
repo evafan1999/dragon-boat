@@ -55,8 +55,8 @@ ehthumbs.db
 Desktop.ini
 
 # Static files
-static/css/
-static/js/
+# static/css/
+# static/js/
 
 # Ignore pyenv
 .python-version
