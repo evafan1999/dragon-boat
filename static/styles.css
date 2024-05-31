@@ -1,0 +1,95 @@
+/* 共用樣式 */
+.card {
+    margin: 5px 0;
+}
+#loading {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 1000;
+    font-size: 2em;
+}
+footer {
+    background-color: #b8bdb5;
+    padding: 10px 0;
+}
+footer .text-center {
+    padding: 10px 0;
+}
+footer p {
+    margin: 0;
+    text-align: center;
+}
+
+/* 成員管理頁面樣式 */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    display: none;
+}
+.form-control, .form-select {
+    margin-bottom: 10px;
+}
+.btn {
+    margin-bottom: 10px;
+}
+.table-responsive {
+    margin-top: 10px;
+}
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+    .card-title {
+        font-size: 1rem;
+    }
+    .table th, .table td {
+        white-space: nowrap;
+    }
+    .table thead {
+        display: none;
+    }
+    .table tr {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+        border-bottom: 2px solid #ddd;
+    }
+    .table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+    }
+    .table td::before {
+        content: attr(data-label);
+        flex-basis: 50%;
+        text-align: left;
+        font-weight: bold;
+    }
+}
+footer {
+    background-color: #b8bdb5;
+    padding: 10px 0;
+}
+footer .text-center {
+    padding: 10px 0;
+}
+footer p {
+    margin: 0;
+    text-align: center;
+}
