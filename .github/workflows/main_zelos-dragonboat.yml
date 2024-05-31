@@ -15,10 +15,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
       - name: Set up Python version
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v3
         with:
           python-version: '3.11'
 
@@ -54,7 +54,7 @@ jobs:
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v3.1.0
+        uses: actions/download-artifact@v3.0.0
         with:
           name: python-app
 
@@ -63,7 +63,7 @@ jobs:
 
       
       - name: Login to Azure
-        uses: azure/login@v1.1.0
+        uses: azure/login@v1.2.0
         with:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_79979A425661482E882E412C43B33FC8 }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B4D2FB4B30A9494CA9E483AE4922FAA3 }}
