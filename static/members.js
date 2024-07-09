@@ -40,6 +40,7 @@ async function fetchMembers() {
                 <td data-label="體重"><input type="number" class="form-control" value="${member.weight}"></td>
                 <td data-label="分類">
                     <select class="form-select">
+                        <option value="none" ${member.category === 'none' ? 'selected' : ''}> </option>
                         <option value="大混" ${member.category === '大混' ? 'selected' : ''}>大混</option>
                         <option value="小混" ${member.category === '小混' ? 'selected' : ''}>小混</option>
                     </select>
