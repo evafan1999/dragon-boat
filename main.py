@@ -25,7 +25,8 @@ class Member(BaseModel):
 
 # 爬取數據
 def scrape_data():
-    url = "https://densuke.biz/list?cd=zmeRuJKrVJvpQUJn#google_vignette"
+    # url = "https://densuke.biz/list?cd=zmeRuJKrVJvpQUJn#google_vignette" 五六月
+    url = "https://densuke.biz/list?cd=pA9QsVcW7K9MnnY7"
     response = requests.get(url)
 
     if response.status_code == 200:
