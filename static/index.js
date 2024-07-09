@@ -1,14 +1,25 @@
+console.log("index.js 加載成功");
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOM 加載完成");
+    populateDates().then(getAttendance);
+});
+
 let currentDate = null;
 
 async function getAttendance() {
+    console.log("getAttendance 函數被調用");
     document.getElementById('loading').style.display = 'block';
     const selectDate = document.getElementById('selectDate').value;
+    console.log("選擇的日期:", selectDate);
     saveState(currentDate);
     currentDate = selectDate;
 
     try {
         const response = await fetch('/api/attendance');
+        console.log("API 請求發送");
         const data = await response.json();
+        console.log("API 回應數據:", data);
 
         if (data.error) {
             throw new Error(data.error);
@@ -18,6 +29,8 @@ async function getAttendance() {
         const index = dates.indexOf(selectDate);
         const names = data.names;
         const attendance = data.attendance[index];
+
+        console.log("處理後的數據:", { dates, index, names, attendance });
 
         const attendanceList = document.getElementById('attendanceList');
         attendanceList.innerHTML = ''; // Clear previous list
@@ -45,29 +58,41 @@ async function getAttendance() {
 
         const membersResponse = await fetch('/api/current_members');
         const membersData = await membersResponse.json();
+        console.log("membersData:", membersData);
 
         if (membersData.error) {
             throw new Error(membersData.error);
         }
 
         const allMembers = membersData.members;
-        const bigDragonLeftMembers = membersData.members.filter(member => member.category === '大混' && member.side === 'Left' && attendance[names.indexOf(member.name)] === '○');
-        const bigDragonRightMembers = membersData.members.filter(member => member.category === '大混' && member.side === 'Right' && attendance[names.indexOf(member.name)] === '○');
-        const smallDragonLeftMembers = membersData.members.filter(member => member.category === '小混' && member.side === 'Left' && attendance[names.indexOf(member.name)] === '○');
-        const smallDragonRightMembers = membersData.members.filter(member => member.category === '小混' && member.side === 'Right' && attendance[names.indexOf(member.name)] === '○');
+        const bigDragonLeftMembers = allMembers.filter(member => member.category === '大混' && member.side === 'Left' && attendance[names.indexOf(member.name)] === '○');
+        const bigDragonRightMembers = allMembers.filter(member => member.category === '大混' && member.side === 'Right' && attendance[names.indexOf(member.name)] === '○');
+        const smallDragonLeftMembers = allMembers.filter(member => member.category === '小混' && member.side === 'Left' && attendance[names.indexOf(member.name)] === '○');
+        const smallDragonRightMembers = allMembers.filter(member => member.category === '小混' && member.side === 'Right' && attendance[names.indexOf(member.name)] === '○');
+        const uncategorizedMembers = allMembers.filter(member => member.category === 'none' && attendance[names.indexOf(member.name)] === '○');
 
-        const allPresentMembers = membersData.members.filter(member => attendance[names.indexOf(member.name)] === '○');
-        const allAbsentMembers = membersData.members.filter(member => attendance[names.indexOf(member.name)] !== '○');
+        const allPresentMembers = allMembers.filter(member => attendance[names.indexOf(member.name)] === '○');
+        const allAbsentMembers = allMembers.filter(member => attendance[names.indexOf(member.name)] !== '○');
+
+        // 打印調試信息
+        console.log('allMembers:', allMembers);
+        console.log('bigDragonLeftMembers:', bigDragonLeftMembers);
+        console.log('bigDragonRightMembers:', bigDragonRightMembers);
+        console.log('smallDragonLeftMembers:', smallDragonLeftMembers);
+        console.log('smallDragonRightMembers:', smallDragonRightMembers);
+        console.log('uncategorizedMembers:', uncategorizedMembers);
+        console.log('allPresentMembers:', allPresentMembers);
+        console.log('allAbsentMembers:', allAbsentMembers);
 
         populateSpecialOptions('left_0', 'right_0', allPresentMembers, allAbsentMembers);
         for (let i = 1; i <= 12; i++) {
-            populateOptions('left_' + i, 'right_' + i, bigDragonLeftMembers, bigDragonRightMembers, smallDragonLeftMembers, smallDragonRightMembers, allAbsentMembers);
+            populateOptions('left_' + i, 'right_' + i, bigDragonLeftMembers, bigDragonRightMembers, smallDragonLeftMembers, smallDragonRightMembers, allAbsentMembers, uncategorizedMembers);
         }
         populateHelmsmanOptions('left_helmsman', allPresentMembers, allAbsentMembers);
 
         populateSpecialOptions('small_left_0', 'small_right_0', allPresentMembers, allAbsentMembers);
         for (let i = 1; i <= 8; i++) {
-            populateOptions('small_left_' + i, 'small_right_' + i, bigDragonLeftMembers, bigDragonRightMembers, smallDragonLeftMembers, smallDragonRightMembers, allAbsentMembers);
+            populateOptions('small_left_' + i, 'small_right_' + i, bigDragonLeftMembers, bigDragonRightMembers, smallDragonLeftMembers, smallDragonRightMembers, allAbsentMembers, uncategorizedMembers);
         }
         populateHelmsmanOptions('small_helmsman', allPresentMembers, allAbsentMembers);
 
@@ -95,39 +120,17 @@ function populateSpecialOptions(leftId, rightId, allPresentMembers, allAbsentMem
     selectLeft.appendChild(emptyOption.cloneNode(true));
     selectRight.appendChild(emptyOption.cloneNode(true));
 
-    const optgroupPresentLeft = document.createElement('optgroup');
-    optgroupPresentLeft.label = '今日出席';
-    selectLeft.appendChild(optgroupPresentLeft);
+    const optgroupPresentLeft = createOptgroup('今日出席', allPresentMembers);
+    if (optgroupPresentLeft) selectLeft.appendChild(optgroupPresentLeft);
 
-    const optgroupAbsentLeft = document.createElement('optgroup');
-    optgroupAbsentLeft.label = '未登記出席';
-    selectLeft.appendChild(optgroupAbsentLeft);
+    const optgroupAbsentLeft = createOptgroup('未登記出席', allAbsentMembers);
+    if (optgroupAbsentLeft) selectLeft.appendChild(optgroupAbsentLeft);
 
-    const optgroupPresentRight = document.createElement('optgroup');
-    optgroupPresentRight.label = '今日出席';
-    selectRight.appendChild(optgroupPresentRight);
+    const optgroupPresentRight = createOptgroup('今日出席', allPresentMembers);
+    if (optgroupPresentRight) selectRight.appendChild(optgroupPresentRight);
 
-    const optgroupAbsentRight = document.createElement('optgroup');
-    optgroupAbsentRight.label = '未登記出席';
-    selectRight.appendChild(optgroupAbsentRight);
-
-    allPresentMembers.forEach(member => {
-        const option = document.createElement('option');
-        option.text = member.name;
-        option.value = member.name;
-        option.dataset.weight = member.weight;
-        optgroupPresentLeft.appendChild(option.cloneNode(true));
-        optgroupPresentRight.appendChild(option.cloneNode(true));
-    });
-
-    allAbsentMembers.forEach(member => {
-        const option = document.createElement('option');
-        option.text = member.name;
-        option.value = member.name;
-        option.dataset.weight = member.weight;
-        optgroupAbsentLeft.appendChild(option.cloneNode(true));
-        optgroupAbsentRight.appendChild(option.cloneNode(true));
-    });
+    const optgroupAbsentRight = createOptgroup('未登記出席', allAbsentMembers);
+    if (optgroupAbsentRight) selectRight.appendChild(optgroupAbsentRight);
 
     selectLeft.addEventListener('change', disableSelectedOptions);
     selectRight.addEventListener('change', disableSelectedOptions);
@@ -135,7 +138,23 @@ function populateSpecialOptions(leftId, rightId, allPresentMembers, allAbsentMem
     selectRight.addEventListener('change', calculateWeights);
 }
 
-function populateOptions(leftId, rightId, bigDragonLeftMembers, bigDragonRightMembers, smallDragonLeftMembers, smallDragonRightMembers, allAbsentMembers) {
+function createOptgroup(label, members) {
+    if (members.length > 0) {
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = label;
+        members.forEach(member => {
+            const option = document.createElement('option');
+            option.text = member.name;
+            option.value = member.name;
+            option.dataset.weight = member.weight;
+            optgroup.appendChild(option);
+        });
+        return optgroup;
+    }
+    return null;
+}
+
+function populateOptions(leftId, rightId, bigDragonLeftMembers, bigDragonRightMembers, smallDragonLeftMembers, smallDragonRightMembers, allAbsentMembers, uncategorizedMembers) {
     const selectLeft = document.getElementById(leftId);
     const selectRight = document.getElementById(rightId);
     selectLeft.innerHTML = '';
@@ -147,70 +166,29 @@ function populateOptions(leftId, rightId, bigDragonLeftMembers, bigDragonRightMe
     selectLeft.appendChild(emptyOption.cloneNode(true));
     selectRight.appendChild(emptyOption.cloneNode(true));
 
-    const optgroupBigLeft = document.createElement('optgroup');
-    optgroupBigLeft.label = '大混 - 左';
-    selectLeft.appendChild(optgroupBigLeft);
+    const optgroupBigLeft = createOptgroup('大混 - 左', bigDragonLeftMembers);
+    if (optgroupBigLeft) selectLeft.appendChild(optgroupBigLeft);
 
-    const optgroupBigRight = document.createElement('optgroup');
-    optgroupBigRight.label = '大混 - 右';
-    selectRight.appendChild(optgroupBigRight);
+    const optgroupBigRight = createOptgroup('大混 - 右', bigDragonRightMembers);
+    if (optgroupBigRight) selectRight.appendChild(optgroupBigRight);
 
-    const optgroupSmallLeft = document.createElement('optgroup');
-    optgroupSmallLeft.label = '小混 - 左';
-    selectLeft.appendChild(optgroupSmallLeft);
+    const optgroupSmallLeft = createOptgroup('小混 - 左', smallDragonLeftMembers);
+    if (optgroupSmallLeft) selectLeft.appendChild(optgroupSmallLeft);
 
-    const optgroupSmallRight = document.createElement('optgroup');
-    optgroupSmallRight.label = '小混 - 右';
-    selectRight.appendChild(optgroupSmallRight);
+    const optgroupSmallRight = createOptgroup('小混 - 右', smallDragonRightMembers);
+    if (optgroupSmallRight) selectRight.appendChild(optgroupSmallRight);
 
-    const optgroupOthersLeft = document.createElement('optgroup');
-    optgroupOthersLeft.label = '未登記出席';
-    selectLeft.appendChild(optgroupOthersLeft);
+    const optgroupUncategorizedLeft = createOptgroup('未分類', uncategorizedMembers);
+    if (optgroupUncategorizedLeft) selectLeft.appendChild(optgroupUncategorizedLeft);
 
-    const optgroupOthersRight = document.createElement('optgroup');
-    optgroupOthersRight.label = '未登記出席';
-    selectRight.appendChild(optgroupOthersRight);
+    const optgroupUncategorizedRight = createOptgroup('未分類', uncategorizedMembers);
+    if (optgroupUncategorizedRight) selectRight.appendChild(optgroupUncategorizedRight);
 
-    bigDragonLeftMembers.forEach(member => {
-        const option = document.createElement('option');
-        option.text = member.name;
-        option.value = member.name;
-        option.dataset.weight = member.weight;
-        optgroupBigLeft.appendChild(option.cloneNode(true));
-    });
+    const optgroupOthersLeft = createOptgroup('未登記出席', allAbsentMembers);
+    if (optgroupOthersLeft) selectLeft.appendChild(optgroupOthersLeft);
 
-    bigDragonRightMembers.forEach(member => {
-        const option = document.createElement('option');
-        option.text = member.name;
-        option.value = member.name;
-        option.dataset.weight = member.weight;
-        optgroupBigRight.appendChild(option.cloneNode(true));
-    });
-
-    smallDragonLeftMembers.forEach(member => {
-        const option = document.createElement('option');
-        option.text = member.name;
-        option.value = member.name;
-        option.dataset.weight = member.weight;
-        optgroupSmallLeft.appendChild(option.cloneNode(true));
-    });
-
-    smallDragonRightMembers.forEach(member => {
-        const option = document.createElement('option');
-        option.text = member.name;
-        option.value = member.name;
-        option.dataset.weight = member.weight;
-        optgroupSmallRight.appendChild(option.cloneNode(true));
-    });
-
-    allAbsentMembers.forEach(member => {
-        const option = document.createElement('option');
-        option.text = member.name;
-        option.value = member.name;
-        option.dataset.weight = member.weight;
-        optgroupOthersLeft.appendChild(option.cloneNode(true));
-        optgroupOthersRight.appendChild(option.cloneNode(true));
-    });
+    const optgroupOthersRight = createOptgroup('未登記出席', allAbsentMembers);
+    if (optgroupOthersRight) selectRight.appendChild(optgroupOthersRight);
 
     selectLeft.addEventListener('change', disableSelectedOptions);
     selectRight.addEventListener('change', disableSelectedOptions);
@@ -227,29 +205,11 @@ function populateHelmsmanOptions(helmsmanId, allPresentMembers, allAbsentMembers
     emptyOption.value = '';
     selectHelmsman.appendChild(emptyOption.cloneNode(true));
 
-    const optgroupPresent = document.createElement('optgroup');
-    optgroupPresent.label = '今日出席';
-    selectHelmsman.appendChild(optgroupPresent);
+    const optgroupPresent = createOptgroup('今日出席', allPresentMembers);
+    if (optgroupPresent) selectHelmsman.appendChild(optgroupPresent);
 
-    const optgroupAbsent = document.createElement('optgroup');
-    optgroupAbsent.label = '未登記出席';
-    selectHelmsman.appendChild(optgroupAbsent);
-
-    allPresentMembers.forEach(member => {
-        const option = document.createElement('option');
-        option.text = member.name;
-        option.value = member.name;
-        option.dataset.weight = member.weight;
-        optgroupPresent.appendChild(option.cloneNode(true));
-    });
-
-    allAbsentMembers.forEach(member => {
-        const option = document.createElement('option');
-        option.text = member.name;
-        option.value = member.name;
-        option.dataset.weight = member.weight;
-        optgroupAbsent.appendChild(option.cloneNode(true));
-    });
+    const optgroupAbsent = createOptgroup('未登記出席', allAbsentMembers);
+    if (optgroupAbsent) selectHelmsman.appendChild(optgroupAbsent);
 
     selectHelmsman.addEventListener('change', disableSelectedOptions);
 }

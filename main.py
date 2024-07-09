@@ -1,8 +1,7 @@
-import os
 import sqlite3
 from bs4 import BeautifulSoup
-from fastapi import FastAPI, Form, HTTPException
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List
