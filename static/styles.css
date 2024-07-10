@@ -60,6 +60,22 @@ footer p {
     -webkit-overflow-scrolling: touch;
 }
 
+.table-fixed thead,
+.table-fixed tbody {
+    display: block;
+}
+
+.table-fixed tbody {
+    width: 100%;
+    overflow-y: auto;
+    height: auto; /* Adjust the height as needed */
+}
+
+.table-fixed th,
+.table-fixed td {
+    width: 33.33%; /* Adjust the width as needed */
+}
+
 @media (max-width: 768px) {
     h1 {
         font-size: 1.5rem;
