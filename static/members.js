@@ -94,9 +94,9 @@ async function addNewMemberRow() {
             <td data-label="體重"><input type="number" class="form-control"></td>
             <td data-label="分類">
                 <select class="form-select">
+                    <option value="未分類"> </option>
                     <option value="大混">大混</option>
                     <option value="小混">小混</option>
-                    <option value="未分類"> </option>
                 </select>
             </td>
             <td data-label="操作"><button class="btn btn-danger" onclick="deleteMember(this)">刪除</button></td>
