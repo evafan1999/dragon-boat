@@ -56,6 +56,8 @@ footer p {
 
 .table-responsive {
     margin-top: 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 @media (max-width: 768px) {
@@ -71,28 +73,52 @@ footer p {
         white-space: nowrap;
     }
 
-    .table thead {
-        display: none;
+    .table {
+        overflow-x: auto;
+        display: block;
     }
 
-    .table tr {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 10px;
-        border-bottom: 2px solid #ddd;
+    .table thead, .table tbody {
+        display: block;
+    }
+
+    .table tbody {
+        width: 100%;
+    }
+
+    .table tbody tr {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
     }
 
     .table td {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px;
+        display: table-cell;
     }
 
-    .table td::before {
-        content: attr(data-label);
-        flex-basis: 50%;
-        text-align: left;
-        font-weight: bold;
+    .d-flex {
+        display: block;
+    }
+
+    .justify-content-between {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .align-items-end {
+        display: flex;
+        align-items: flex-end;
+    }
+
+    .mb-4 {
+        margin-bottom: 1.5rem;
+    }
+
+    .mb-3 {
+        margin-bottom: 1rem;
+    }
+
+    .flex-wrap {
+        flex-wrap: wrap;
     }
 }
