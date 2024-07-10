@@ -9,74 +9,76 @@
 </head>
 <body>
     <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-end mb-4">
+        <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap">
             <h1>派兜出席表</h1>
             <div>
                 <label for="selectDate" class="form-label">Select Date:</label>
                 <select id="selectDate" class="form-select" onchange="onDateChange()"></select>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-6 mb-4" id="bigDragonTableContainer">
-                <table class="table table-sm">
-                    <caption class="caption-top">大龍 <span id="bigDragonDate"></span></caption>
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">左</th>
-                            <th scope="col">右</th>
-                        </tr>
-                    </thead>
-                    <tbody id="paddleTableBody">
-                        <tr><td>0</td><td><select class="form-select" id="left_0"></select></td><td><select class="form-select" id="right_0"></select></td></tr>
-                        <tr><td>1</td><td><select class="form-select" id="left_1"></select></td><td><select class="form-select" id="right_1"></select></td></tr>
-                        <tr><td>2</td><td><select class="form-select" id="left_2"></select></td><td><select class="form-select" id="right_2"></select></td></tr>
-                        <tr><td>3</td><td><select class="form-select" id="left_3"></select></td><td><select class="form-select" id="right_3"></select></td></tr>
-                        <tr><td>4</td><td><select class="form-select" id="left_4"></select></td><td><select class="form-select" id="right_4"></select></td></tr>
-                        <tr><td>5</td><td><select class="form-select" id="left_5"></select></td><td><select class="form-select" id="right_5"></select></td></tr>
-                        <tr><td>6</td><td><select class="form-select" id="left_6"></select></td><td><select class="form-select" id="right_6"></select></td></tr>
-                        <tr><td>7</td><td><select class="form-select" id="left_7"></select></td><td><select class="form-select" id="right_7"></select></td></tr>
-                        <tr><td>8</td><td><select class="form-select" id="left_8"></select></td><td><select class="form-select" id="right_8"></select></td></tr>
-                        <tr><td>9</td><td><select class="form-select" id="left_9"></select></td><td><select class="form-select" id="right_9"></select></td></tr>
-                        <tr><td>10</td><td><select class="form-select" id="left_10"></select></td><td><select class="form-select" id="right_10"></select></td></tr>
-                        <tr><td>11</td><td><select class="form-select" id="left_11"></select></td><td><select class="form-select" id="right_11"></select></td></tr>
-                        <tr><td>12</td><td><select class="form-select" id="left_12"></select></td><td><select class="form-select" id="right_12"></select></td></tr>
-                        <tr><td>舵手</td><td><select class="form-select" id="left_helmsman"></select></td><td></td></tr>
-                        <tr><td>重量</td><td id="leftWeight">0</td><td id="rightWeight">0</td></tr>
-                    </tbody>
-                </table>
-                <div class="d-flex justify-content-between">
-                    <button onclick="clearTable('bigDragonTableContainer')" class="btn btn-secondary">清除表格</button>
-                    <button onclick="exportTableToImage('bigDragonTableContainer', '大龍')" class="btn btn-primary">Print Big Dragon</button>
+        <div class="table-responsive">
+            <div class="row">
+                <div class="col-lg-6 col-12 mb-4" id="bigDragonTableContainer">
+                    <table class="table table-sm table-bordered">
+                        <caption class="caption-top">大龍 <span id="bigDragonDate"></span></caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">左</th>
+                                <th scope="col">右</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paddleTableBody">
+                            <tr><td>0</td><td><select class="form-select" id="left_0"></select></td><td><select class="form-select" id="right_0"></select></td></tr>
+                            <tr><td>1</td><td><select class="form-select" id="left_1"></select></td><td><select class="form-select" id="right_1"></select></td></tr>
+                            <tr><td>2</td><td><select class="form-select" id="left_2"></select></td><td><select class="form-select" id="right_2"></select></td></tr>
+                            <tr><td>3</td><td><select class="form-select" id="left_3"></select></td><td><select class="form-select" id="right_3"></select></td></tr>
+                            <tr><td>4</td><td><select class="form-select" id="left_4"></select></td><td><select class="form-select" id="right_4"></select></td></tr>
+                            <tr><td>5</td><td><select class="form-select" id="left_5"></select></td><td><select class="form-select" id="right_5"></select></td></tr>
+                            <tr><td>6</td><td><select class="form-select" id="left_6"></select></td><td><select class="form-select" id="right_6"></select></td></tr>
+                            <tr><td>7</td><td><select class="form-select" id="left_7"></select></td><td><select class="form-select" id="right_7"></select></td></tr>
+                            <tr><td>8</td><td><select class="form-select" id="left_8"></select></td><td><select class="form-select" id="right_8"></select></td></tr>
+                            <tr><td>9</td><td><select class="form-select" id="left_9"></select></td><td><select class="form-select" id="right_9"></select></td></tr>
+                            <tr><td>10</td><td><select class="form-select" id="left_10"></select></td><td><select class="form-select" id="right_10"></select></td></tr>
+                            <tr><td>11</td><td><select class="form-select" id="left_11"></select></td><td><select class="form-select" id="right_11"></select></td></tr>
+                            <tr><td>12</td><td><select class="form-select" id="left_12"></select></td><td><select class="form-select" id="right_12"></select></td></tr>
+                            <tr><td>舵手</td><td><select class="form-select" id="left_helmsman"></select></td><td></td></tr>
+                            <tr><td>重量</td><td id="leftWeight">0</td><td id="rightWeight">0</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="d-flex justify-content-between">
+                        <button onclick="clearTable('bigDragonTableContainer')" class="btn btn-secondary">清除表格</button>
+                        <button onclick="exportTableToImage('bigDragonTableContainer', '大龍')" class="btn btn-primary">Print Big Dragon</button>
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-6 mb-4" id="smallDragonTableContainer">
-                <table class="table table-sm">
-                    <caption class="caption-top">小龍 <span id="smallDragonDate"></span></caption>
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">左</th>
-                            <th scope="col">右</th>
-                        </tr>
-                    </thead>
-                    <tbody id="smallPaddleTableBody">
-                        <tr><td>0</td><td><select class="form-select" id="small_left_0"></select></td><td><select class="form-select" id="small_right_0"></select></td></tr>
-                        <tr><td>1</td><td><select class="form-select" id="small_left_1"></select></td><td><select class="form-select" id="small_right_1"></select></td></tr>
-                        <tr><td>2</td><td><select class="form-select" id="small_left_2"></select></td><td><select class="form-select" id="small_right_2"></select></td></tr>
-                        <tr><td>3</td><td><select class="form-select" id="small_left_3"></select></td><td><select class="form-select" id="small_right_3"></select></td></tr>
-                        <tr><td>4</td><td><select class="form-select" id="small_left_4"></select></td><td><select class="form-select" id="small_right_4"></select></td></tr>
-                        <tr><td>5</td><td><select class="form-select" id="small_left_5"></select></td><td><select class="form-select" id="small_right_5"></select></td></tr>
-                        <tr><td>6</td><td><select class="form-select" id="small_left_6"></select></td><td><select class="form-select" id="small_right_6"></select></td></tr>
-                        <tr><td>7</td><td><select class="form-select" id="small_left_7"></select></td><td><select class="form-select" id="small_right_7"></select></td></tr>
-                        <tr><td>8</td><td><select class="form-select" id="small_left_8"></select></td><td><select class="form-select" id="small_right_8"></select></td></tr>
-                        <tr><td>舵手</td><td><select class="form-select" id="small_helmsman"></select></td><td></td></tr>
-                        <tr><td>重量</td><td id="smallLeftWeight">0</td><td id="smallRightWeight">0</td></tr>
-                    </tbody>
-                </table>
-                <div class="d-flex justify-content-between">
-                    <button onclick="clearTable('smallDragonTableContainer')" class="btn btn-secondary">清除表格</button>
-                    <button onclick="exportTableToImage('smallDragonTableContainer', '小龍')" class="btn btn-primary">Print Small Dragon</button>
+                <div class="col-lg-6 col-12 mb-4" id="smallDragonTableContainer">
+                    <table class="table table-sm table-bordered">
+                        <caption class="caption-top">小龍 <span id="smallDragonDate"></span></caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">左</th>
+                                <th scope="col">右</th>
+                            </tr>
+                        </thead>
+                        <tbody id="smallPaddleTableBody">
+                            <tr><td>0</td><td><select class="form-select" id="small_left_0"></select></td><td><select class="form-select" id="small_right_0"></select></td></tr>
+                            <tr><td>1</td><td><select class="form-select" id="small_left_1"></select></td><td><select class="form-select" id="small_right_1"></select></td></tr>
+                            <tr><td>2</td><td><select class="form-select" id="small_left_2"></select></td><td><select class="form-select" id="small_right_2"></select></td></tr>
+                            <tr><td>3</td><td><select class="form-select" id="small_left_3"></select></td><td><select class="form-select" id="small_right_3"></select></td></tr>
+                            <tr><td>4</td><td><select class="form-select" id="small_left_4"></select></td><td><select class="form-select" id="small_right_4"></select></td></tr>
+                            <tr><td>5</td><td><select class="form-select" id="small_left_5"></select></td><td><select class="form-select" id="small_right_5"></select></td></tr>
+                            <tr><td>6</td><td><select class="form-select" id="small_left_6"></select></td><td><select class="form-select" id="small_right_6"></select></td></tr>
+                            <tr><td>7</td><td><select class="form-select" id="small_left_7"></select></td><td><select class="form-select" id="small_right_7"></select></td></tr>
+                            <tr><td>8</td><td><select class="form-select" id="small_left_8"></select></td><td><select class="form-select" id="small_right_8"></select></td></tr>
+                            <tr><td>舵手</td><td><select class="form-select" id="small_helmsman"></select></td><td></td></tr>
+                            <tr><td>重量</td><td id="smallLeftWeight">0</td><td id="smallRightWeight">0</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="d-flex justify-content-between">
+                        <button onclick="clearTable('smallDragonTableContainer')" class="btn btn-secondary">清除表格</button>
+                        <button onclick="exportTableToImage('smallDragonTableContainer', '小龍')" class="btn btn-primary">Print Small Dragon</button>
+                    </div>
                 </div>
             </div>
         </div>
