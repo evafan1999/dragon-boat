@@ -2,6 +2,7 @@
 .card {
     margin: 5px 0;
 }
+
 #loading {
     position: fixed;
     left: 0;
@@ -15,13 +16,16 @@
     z-index: 1000;
     font-size: 2em;
 }
+
 footer {
     background-color: #b8bdb5;
     padding: 10px 0;
 }
+
 footer .text-center {
     padding: 10px 0;
 }
+
 footer p {
     margin: 0;
     text-align: center;
@@ -41,55 +45,54 @@ footer p {
     z-index: 9999;
     display: none;
 }
+
 .form-control, .form-select {
     margin-bottom: 10px;
 }
+
 .btn {
     margin-bottom: 10px;
 }
+
 .table-responsive {
     margin-top: 10px;
 }
+
 @media (max-width: 768px) {
     h1 {
         font-size: 1.5rem;
     }
+
     .card-title {
         font-size: 1rem;
     }
+
     .table th, .table td {
         white-space: nowrap;
     }
+
     .table thead {
         display: none;
     }
+
     .table tr {
         display: flex;
         flex-direction: column;
         margin-bottom: 10px;
         border-bottom: 2px solid #ddd;
     }
+
     .table td {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 10px;
     }
+
     .table td::before {
         content: attr(data-label);
         flex-basis: 50%;
         text-align: left;
         font-weight: bold;
     }
-}
-footer {
-    background-color: #b8bdb5;
-    padding: 10px 0;
-}
-footer .text-center {
-    padding: 10px 0;
-}
-footer p {
-    margin: 0;
-    text-align: center;
 }

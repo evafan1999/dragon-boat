@@ -1,12 +1,13 @@
 import sqlite3
+import requests
+import logging
 from bs4 import BeautifulSoup
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List
-import requests
-import logging
+from fastapi.middleware.cors import CORSMiddleware
 
 # 設置日誌
 logging.basicConfig(level=logging.INFO)
@@ -45,6 +46,15 @@ def scrape_data():
     else:
         logger.error(f"Failed to fetch data from {url}. Status code: {response.status_code}")
         return {"error": "Failed to fetch data"}
+
+# 設置 CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 可以設置具體的允許來源
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # 路由
 @app.get("/")
