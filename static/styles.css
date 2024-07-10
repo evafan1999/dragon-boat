@@ -92,7 +92,7 @@ footer p {
         table-layout: fixed;
     }
 
-    .table td {
+    .table td, .table th {
         display: table-cell;
     }
 
