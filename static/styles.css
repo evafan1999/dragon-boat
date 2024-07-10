@@ -110,6 +110,7 @@ footer p {
 
     .table td, .table th {
         display: table-cell;
+        text-align: center;
     }
 
     .d-flex {
