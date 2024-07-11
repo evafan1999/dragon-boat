@@ -94,7 +94,7 @@ async function addNewMemberRow() {
             <td data-label="體重"><input type="number" class="form-control"></td>
             <td data-label="分類">
                 <select class="form-select">
-                    <option value="未分類"> </option>
+                    <option value="none"> </option>
                     <option value="大混">大混</option>
                     <option value="小混">小混</option>
                 </select>
@@ -104,6 +104,9 @@ async function addNewMemberRow() {
         memberTableBody.appendChild(row);
         isEdited = true;
         document.getElementById('updateMembersButton').disabled = false;
+
+        // 滾動到頁面底部
+        row.scrollIntoView({ behavior: 'smooth', block: 'end' });
     } catch (error) {
         console.error('Error adding new member row:', error);
         alert('Error adding new member row: ' + error.message);
