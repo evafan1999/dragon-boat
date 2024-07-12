@@ -2,7 +2,6 @@
 .card {
     margin: 5px 0;
 }
-
 #loading {
     position: fixed;
     left: 0;
@@ -16,16 +15,13 @@
     z-index: 1000;
     font-size: 2em;
 }
-
 footer {
     background-color: #b8bdb5;
     padding: 10px 0;
 }
-
 footer .text-center {
     padding: 10px 0;
 }
-
 footer p {
     margin: 0;
     text-align: center;
@@ -45,61 +41,57 @@ footer p {
     z-index: 9999;
     display: none;
 }
-
 .form-control, .form-select {
     margin-bottom: 10px;
 }
-
 .btn {
     margin-bottom: 10px;
 }
-
 .table-responsive {
     margin-top: 10px;
 }
 
-/* 手機響應樣式 */
+/* 修正表格顯示 */
+.fixed-column {
+    width: 20%;
+    white-space: nowrap;
+}
+
+/* 手機樣式 */
 @media (max-width: 768px) {
-    .table th, .table td {
+    h1 {
+        font-size: 1.5rem;
+    }
+    .card-title {
+        font-size: 1rem;
+    }
+    .table {
+        display: block;
+        overflow-x: auto;
         white-space: nowrap;
     }
-
+    .table thead,
+    .table tbody,
+    .table tr,
+    .table td,
+    .table th {
+        display: inline-block;
+        float: none;
+    }
     .table thead {
-        display: none;
+        display: block;
     }
-
-    .table tr {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 10px;
-        border-bottom: 2px solid #ddd;
+    .table tbody {
+        display: block;
+        overflow-x: auto;
     }
-
-    .table td {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px;
+    .table td,
+    .table th {
+        display: block;
     }
-
     .table td::before {
         content: attr(data-label);
-        flex-basis: 50%;
-        text-align: left;
+        display: inline-block;
         font-weight: bold;
     }
-}
-
-footer {
-    background-color: #b8bdb5;
-    padding: 10px 0;
-}
-
-footer .text-center {
-    padding: 10px 0;
-}
-
-footer p {
-    margin: 0;
-    text-align: center;
 }
