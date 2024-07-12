@@ -15,6 +15,15 @@
     z-index: 1000;
     font-size: 2em;
 }
+
+.table{
+    max-width: 800px;
+}
+
+.form-select{
+    vertical-align: middle;
+}
+
 footer {
     background-color: #b8bdb5;
     padding: 10px 0;
@@ -66,6 +75,7 @@ footer p {
         font-size: 1rem;
     }
     .table {
+        max-width: 95%;
         display: block;
         overflow-x: auto;
         white-space: nowrap;
