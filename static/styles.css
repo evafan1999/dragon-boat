@@ -75,23 +75,25 @@ footer p {
     .table tr,
     .table td,
     .table th {
-        display: inline-block;
-        float: none;
-    }
-    .table thead {
         display: block;
     }
-    .table tbody {
-        display: block;
-        overflow-x: auto;
+    .table thead tr {
+        display: none;
     }
-    .table td,
-    .table th {
-        display: block;
+    .table tbody tr {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #ddd;
     }
-    .table td::before {
+    .table tbody td {
+        display: block;
+        text-align: right;
+        white-space: nowrap;
+    }
+    .table tbody td::before {
         content: attr(data-label);
-        display: inline-block;
+        float: left;
         font-weight: bold;
     }
 }
