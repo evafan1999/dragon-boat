@@ -16,7 +16,45 @@
     font-size: 2em;
 }
 
-.table{
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+    list-style: none;
+    padding: 0;
+}
+
+.pagination li {
+    margin: 0 5px;
+}
+
+.pagination a {
+    display: block;
+    padding: 10px 15px;
+    color: #007bff;
+    text-decoration: none;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.pagination .active a {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.pagination a:hover {
+    background-color: #f8f9fa;
+    border-color: #007bff;
+}
+
+.pagination .page-item.disabled a {
+    color: #6c757d;
+    pointer-events: none;
+}
+
+
+.table table-sm table-bordered{
     max-width: 800px;
 }
 

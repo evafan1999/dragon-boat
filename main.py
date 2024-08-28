@@ -2,7 +2,7 @@ import sqlite3
 import requests
 import logging
 from bs4 import BeautifulSoup
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -96,14 +96,24 @@ async def update_members(member_list: List[Member]):
         raise HTTPException(status_code=500, detail=f"Failed to update member list: {str(e)}")
 
 @app.get("/api/current_members")
-async def get_current_members():
+async def get_current_members(page: int = Query(1, ge=1), size: int = Query(15, ge=1)):
     try:
+        offset = (page - 1) * size
         with sqlite3.connect('mydatabase.db') as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT name, side, weight, category FROM members")
+            cursor.execute("SELECT name, side, weight, category FROM members LIMIT ? OFFSET ?", (size, offset))
             members = [{"name": row[0], "side": row[1], "weight": row[2], "category": row[3]} for row in cursor.fetchall()]
 
-        return {"members": members}
+            cursor.execute("SELECT COUNT(*) FROM members")
+            total_count = cursor.fetchone()[0]
+
+        total_pages = (total_count + size - 1) // size  # 計算總頁數
+        return {
+            "members": members,
+            "total_pages": total_pages,
+            "current_page": page,
+            "page_size": size
+        }
     except Exception as e:
         logger.error(f"Failed to retrieve current members: {str(e)}")
         return {"error": f"Failed to retrieve current members: {str(e)}"}

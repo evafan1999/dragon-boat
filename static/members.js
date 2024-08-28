@@ -16,46 +16,77 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-async function fetchMembers() {
-    showLoading();
-    try {
-        const response = await fetch('/api/current_members');
+document.addEventListener("DOMContentLoaded", function() {
+    const rowsPerPage = 15;
+    let currentPage = 1;
+
+    async function fetchMembers(page = 1, size = rowsPerPage) {
+        const response = await fetch(`/api/current_members?page=${page}&size=${size}`);
         const data = await response.json();
-        if (data.error) {
-            throw new Error(data.error);
-        }
-        const memberTableBody = document.getElementById('memberTableBody');
-        memberTableBody.innerHTML = '';
-        data.members.forEach((member, index) => {
+        renderTable(data.members);
+        renderPagination(data.total_pages);
+    }
+
+    function renderTable(members) {
+        const tableBody = document.getElementById('memberTableBody');
+        tableBody.innerHTML = '';
+
+        members.forEach((member, index) => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td data-label="編號">${index + 1}</td>
-                <td data-label="名稱"><input type="text" class="form-control" value="${member.name}" readonly></td>
-                <td data-label="側別">
+                <td>${(currentPage - 1) * rowsPerPage + index + 1}</td>
+                <td><input type="text" class="form-control" value="${member.name}" readonly></td>
+                <td>
                     <select class="form-select">
                         <option value="Left" ${member.side === 'Left' ? 'selected' : ''}>Left</option>
                         <option value="Right" ${member.side === 'Right' ? 'selected' : ''}>Right</option>
                     </select>
                 </td>
-                <td data-label="體重"><input type="number" class="form-control" value="${member.weight}"></td>
-                <td data-label="分類">
+                <td><input type="number" class="form-control" value="${member.weight}"></td>
+                <td>
                     <select class="form-select">
-                        <option value="none" ${member.category === 'none' ? 'selected' : ''}> </option>
+                        <option value="none" ${member.category === 'none' ? 'selected' : ''}></option>
                         <option value="大混" ${member.category === '大混' ? 'selected' : ''}>大混</option>
                         <option value="小混" ${member.category === '小混' ? 'selected' : ''}>小混</option>
                     </select>
                 </td>
-                <td data-label="操作"><button class="btn btn-danger" onclick="deleteMember(this, '${member.name}')">刪除</button></td>
+                <td>
+                    <button class="btn btn-primary btn-sm" onclick="editMember(this)">編輯</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteMember(this)">刪除</button>
+                </td>
             `;
-            memberTableBody.appendChild(row);
+            tableBody.appendChild(row);
         });
-    } catch (error) {
-        console.error('Error fetching members:', error);
-        alert('Error fetching members: ' + error.message);
-    } finally {
-        hideLoading();
     }
-}
+
+    function renderPagination(totalPages) {
+        const paginationControls = document.getElementById('paginationControls');
+        paginationControls.innerHTML = '';
+
+        for (let i = 1; i <= totalPages; i++) {
+            const item = document.createElement('li');
+            item.classList.add('page-item');
+            if (i === currentPage) {
+                item.classList.add('active');
+            }
+            item.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                currentPage = i;
+                loadPage();
+            });
+            paginationControls.appendChild(item);
+        }
+    }
+
+    async function loadPage() {
+        const data = await fetchMembers(currentPage);
+        renderTable(data.members);
+        renderPagination(data.total_pages);
+    }
+
+    loadPage();
+});
 
 async function addNewMemberRow() {
     try {
@@ -99,7 +130,10 @@ async function addNewMemberRow() {
                     <option value="小混">小混</option>
                 </select>
             </td>
-            <td data-label="操作"><button class="btn btn-danger" onclick="deleteMember(this)">刪除</button></td>
+            <td data-label="操作">
+                <button class="btn btn-primary" onclick="editMemberRow(this)">編輯</button>
+                <button class="btn btn-danger" onclick="deleteMember(this)">刪除</button>
+            </td>
         `;
         memberTableBody.appendChild(row);
         isEdited = true;
@@ -147,9 +181,11 @@ async function addNewMember(event) {
     }
 }
 
-function deleteMember(button, name = null) {
+function deleteMember(button) {
     const row = button.closest('tr');
+    const name = row.cells[1].querySelector('input').value;
     row.remove();
+
     if (name) {
         fetch(`/api/delete_member?name=${name}`, { method: 'DELETE' })
             .then(response => response.json())
@@ -182,7 +218,7 @@ async function updateMembers() {
     const rows = memberTableBody.querySelectorAll('tr');
     const members = [];
     rows.forEach(row => {
-        const name = row.cells[1].querySelector('select') ? row.cells[1].querySelector('select').value : row.cells[1].querySelector('input').value;
+        const name = row.cells[1].querySelector('input').value;
         const side = row.cells[2].querySelector('select').value;
         const weight = row.cells[3].querySelector('input').value;
         const category = row.cells[4].querySelector('select').value;
@@ -244,4 +280,98 @@ function showLoading() {
 
 function hideLoading() {
     document.getElementById('loadingOverlay').style.display = 'none';
+}
+
+function editMember(button) {
+    const row = button.closest('tr');
+    const inputs = row.querySelectorAll('input, select');
+    inputs.forEach(input => input.removeAttribute('readonly'));
+    button.textContent = '儲存';
+    button.classList.remove('btn-primary');
+    button.classList.add('btn-success');
+    button.setAttribute('onclick', 'saveMember(this)');
+}
+
+function saveMember(button) {
+    const row = button.closest('tr');
+    const name = row.cells[1].querySelector('input').value;
+    const side = row.cells[2].querySelector('select').value;
+    const weight = row.cells[3].querySelector('input').value;
+    const category = row.cells[4].querySelector('select').value;
+
+    const updatedMember = { name, side, weight, category };
+    showLoading();
+    fetch('/api/update_member', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedMember)
+    }).then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            alert(data.message);
+            button.textContent = '編輯';
+            button.classList.remove('btn-success');
+            button.classList.add('btn-primary');
+            button.setAttribute('onclick', 'editMember(this)');
+            isEdited = true;
+            document.getElementById('updateMembersButton').disabled = false;
+        })
+        .catch(error => {
+            console.error('Error saving member:', error);
+            alert('Error saving member: ' + error.message);
+        })
+        .finally(() => {
+            hideLoading();
+        });
+}
+
+function editMemberRow(button) {
+    const row = button.closest('tr');
+    const inputs = row.querySelectorAll('input, select');
+    inputs.forEach(input => input.removeAttribute('readonly'));
+    button.textContent = '儲存';
+    button.classList.remove('btn-primary');
+    button.classList.add('btn-success');
+    button.setAttribute('onclick', 'saveMemberRow(this)');
+}
+
+function saveMemberRow(button) {
+    const row = button.closest('tr');
+    const name = row.cells[1].querySelector('select').value;
+    const side = row.cells[2].querySelector('select').value;
+    const weight = row.cells[3].querySelector('input').value;
+    const category = row.cells[4].querySelector('select').value;
+
+    const updatedMember = { name, side, weight, category };
+    showLoading();
+    fetch('/api/update_member', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedMember)
+    }).then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            alert(data.message);
+            button.textContent = '編輯';
+            button.classList.remove('btn-success');
+            button.classList.add('btn-primary');
+            button.setAttribute('onclick', 'editMemberRow(this)');
+            isEdited = true;
+            document.getElementById('updateMembersButton').disabled = false;
+        })
+        .catch(error => {
+            console.error('Error saving member:', error);
+            alert('Error saving member: ' + error.message);
+        })
+        .finally(() => {
+            hideLoading();
+        });
 }
