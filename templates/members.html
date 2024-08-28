@@ -14,7 +14,7 @@
             <button class="btn" onclick="clearDatabase()" style="margin-bottom: 10px; background-color: #D2D4C8; color: #33312e;">清除資料庫</button>
         </div>
         <div class="table-responsive">
-            <table class="table table-bordered">
+            <table class="table table-bordered table-hover table-sm">
                 <thead>
                     <tr>
                         <th style="width: 5%;">編號</th>
@@ -30,6 +30,11 @@
                 </tbody>
             </table>
         </div>
+        <nav aria-label="Page navigation">
+            <ul class="pagination" id="paginationControls">
+                <!-- 分頁控件將在這裡顯示 -->
+            </ul>
+        </nav>
         <button class="btn" id="updateMembersButton" onclick="updateMembers()" style="margin-bottom: 10px; background-color: #D2D4C8; color: #33312e;" disabled>儲存</button>
         <button class="btn" onclick="location.href = '/';" style="margin-bottom: 10px; background-color: #33312E; color: #E0E2DB;">返回出席表</button>
     </div>
