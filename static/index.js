@@ -65,24 +65,88 @@ async function getAttendance() {
         }
 
         const allMembers = membersData.members;
-        const bigDragonLeftMembers = allMembers.filter(member => member.category === '大混' && member.side === 'Left' && attendance[names.indexOf(member.name)] === '○');
-        const bigDragonRightMembers = allMembers.filter(member => member.category === '大混' && member.side === 'Right' && attendance[names.indexOf(member.name)] === '○');
-        const smallDragonLeftMembers = allMembers.filter(member => member.category === '小混' && member.side === 'Left' && attendance[names.indexOf(member.name)] === '○');
-        const smallDragonRightMembers = allMembers.filter(member => member.category === '小混' && member.side === 'Right' && attendance[names.indexOf(member.name)] === '○');
-        const uncategorizedMembers = allMembers.filter(member => member.category === 'none' && attendance[names.indexOf(member.name)] === '○');
+        // const bigDragonLeftMembers = allMembers.filter(member => member.category === 'One' && member.side === 'Left' && attendance[names.indexOf(member.name)] === '○');
+        // const bigDragonRightMembers = allMembers.filter(member => member.category === 'One' && member.side === 'Right' && attendance[names.indexOf(member.name)] === '○');
+        // const smallDragonLeftMembers = allMembers.filter(member => member.category === 'Two' && member.side === 'Left' && attendance[names.indexOf(member.name)] === '○');
+        // const smallDragonRightMembers = allMembers.filter(member => member.category === 'Two' && member.side === 'Right' && attendance[names.indexOf(member.name)] === '○');
+        // const uncategorizedMembers = allMembers.filter(member => member.category === 'none' && attendance[names.indexOf(member.name)] === '○');
 
-        const allPresentMembers = allMembers.filter(member => attendance[names.indexOf(member.name)] === '○');
-        const allAbsentMembers = allMembers.filter(member => attendance[names.indexOf(member.name)] !== '○');
+        // const allPresentMembers = allMembers.filter(member => attendance[names.indexOf(member.name)] === '○');
+        // const allAbsentMembers = allMembers.filter(member => attendance[names.indexOf(member.name)] !== '○');
 
         // 打印調試信息
-        console.log('allMembers:', allMembers);
-        console.log('bigDragonLeftMembers:', bigDragonLeftMembers);
-        console.log('bigDragonRightMembers:', bigDragonRightMembers);
-        console.log('smallDragonLeftMembers:', smallDragonLeftMembers);
-        console.log('smallDragonRightMembers:', smallDragonRightMembers);
-        console.log('uncategorizedMembers:', uncategorizedMembers);
-        console.log('allPresentMembers:', allPresentMembers);
-        console.log('allAbsentMembers:', allAbsentMembers);
+        // 假設 allMembers、names 和 attendance 都是有效且正確的數據
+
+        // 確保 names 和 attendance 的長度一致
+        if (names.length !== attendance.length) {
+            console.error('names 和 attendance 的長度不匹配');
+        }
+
+        // 檢查每個成員的出席狀態
+        allMembers.forEach(member => {
+            const index = names.indexOf(member.name);
+            if (index === -1) {
+                console.error(`成員 ${member.name} 不在 names 列表中`);
+                return;
+            }
+
+            if (attendance[index] === '○') {
+                console.log(`${member.name} 是出席`);
+            } else {
+                console.log(`${member.name} 是缺席`);
+            }
+        });
+
+        // 過濾大龍左側成員
+        const bigDragonLeftMembers = allMembers.filter(member => {
+            const index = names.indexOf(member.name);
+            return member.category === 'One' && member.side === 'Left' && attendance[index] === '○';
+        });
+        console.log('大龍左側成員:', bigDragonLeftMembers);
+
+        // 過濾大龍右側成員
+        const bigDragonRightMembers = allMembers.filter(member => {
+            const index = names.indexOf(member.name);
+            return member.category === 'One' && member.side === 'Right' && attendance[index] === '○';
+        });
+        console.log('大龍右側成員:', bigDragonRightMembers);
+
+        // 過濾小龍左側成員
+        const smallDragonLeftMembers = allMembers.filter(member => {
+            const index = names.indexOf(member.name);
+            return member.category === 'Two' && member.side === 'Left' && attendance[index] === '○';
+        });
+        console.log('小龍左側成員:', smallDragonLeftMembers);
+
+        // 過濾小龍右側成員
+        const smallDragonRightMembers = allMembers.filter(member => {
+            const index = names.indexOf(member.name);
+            return member.category === 'Two' && member.side === 'Right' && attendance[index] === '○';
+        });
+        console.log('小龍右側成員:', smallDragonRightMembers);
+
+        // 過濾未分類成員
+        const uncategorizedMembers = allMembers.filter(member => {
+            const index = names.indexOf(member.name);
+            return member.category === 'none' && attendance[index] === '○';
+        });
+        console.log('未分類成員:', uncategorizedMembers);
+
+        // 過濾所有出席成員
+        const allPresentMembers = allMembers.filter(member => {
+            const index = names.indexOf(member.name);
+            return attendance[index] === '○';
+        });
+        console.log('所有出席成員:', allPresentMembers);
+
+        // 過濾所有缺席成員
+        const allAbsentMembers = allMembers.filter(member => {
+            const index = names.indexOf(member.name);
+            return attendance[index] !== '○';
+        });
+        console.log('所有缺席成員:', allAbsentMembers);
+
+        
 
         populateSpecialOptions('left_0', 'right_0', allPresentMembers, allAbsentMembers);
         for (let i = 1; i <= 12; i++) {
@@ -166,16 +230,16 @@ function populateOptions(leftId, rightId, bigDragonLeftMembers, bigDragonRightMe
     selectLeft.appendChild(emptyOption.cloneNode(true));
     selectRight.appendChild(emptyOption.cloneNode(true));
 
-    const optgroupBigLeft = createOptgroup('大混 - 左', bigDragonLeftMembers);
+    const optgroupBigLeft = createOptgroup('1隊 - 左', bigDragonLeftMembers);
     if (optgroupBigLeft) selectLeft.appendChild(optgroupBigLeft);
 
-    const optgroupBigRight = createOptgroup('大混 - 右', bigDragonRightMembers);
+    const optgroupBigRight = createOptgroup('1隊 - 右', bigDragonRightMembers);
     if (optgroupBigRight) selectRight.appendChild(optgroupBigRight);
 
-    const optgroupSmallLeft = createOptgroup('小混 - 左', smallDragonLeftMembers);
+    const optgroupSmallLeft = createOptgroup('2隊 - 左', smallDragonLeftMembers);
     if (optgroupSmallLeft) selectLeft.appendChild(optgroupSmallLeft);
 
-    const optgroupSmallRight = createOptgroup('小混 - 右', smallDragonRightMembers);
+    const optgroupSmallRight = createOptgroup('2隊 - 右', smallDragonRightMembers);
     if (optgroupSmallRight) selectRight.appendChild(optgroupSmallRight);
 
     const optgroupUncategorizedLeft = createOptgroup('未分類', uncategorizedMembers);
@@ -364,3 +428,58 @@ function exportTableToImage(tableId, dragonType) {
 }
 
 populateDates().then(getAttendance);
+
+// 新增功能：更新 available_names
+async function updateAvailableNames() {
+    try {
+        const response = await fetch('/api/current_members');
+        const data = await response.json();
+
+        if (data.error) {
+            throw new Error(data.error);
+        }
+
+        const allMembers = data.members;
+        const availableNames = allMembers.map(member => member.name);
+
+        // 假設你有一個函數來更新選單選項
+        updateSelectOptions(availableNames);
+    } catch (error) {
+        console.error('Error updating available names:', error);
+        alert('Error updating available names: ' + error.message);
+    }
+}
+
+// 修改：當按下「Add Member」時調用更新 available_names 的函數
+document.getElementById('addMemberButton').addEventListener('click', async () => {
+    // 這裡假設你有方法來添加成員到後端
+    await addMember();
+    await updateAvailableNames(); // 添加成員後更新 available_names
+});
+
+// 新增方法：更新選單選項
+function updateSelectOptions(names) {
+    // 假設你有一個方法來更新 select 元素的選項
+    const selects = document.querySelectorAll('select');
+    selects.forEach(select => {
+        const currentValue = select.value;
+        select.innerHTML = ''; // 清空現有選項
+
+        const emptyOption = document.createElement('option');
+        emptyOption.text = '';
+        emptyOption.value = '';
+        select.appendChild(emptyOption);
+
+        names.forEach(name => {
+            const option = document.createElement('option');
+            option.text = name;
+            option.value = name;
+            select.appendChild(option);
+        });
+
+        select.value = currentValue; // 保留先前選中的值
+    });
+
+    disableSelectedOptions(); // 更新後禁用已選擇的選項
+}
+

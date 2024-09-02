@@ -1,11 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     const memberForm = document.getElementById('memberForm');
     const membersTableBody = document.getElementById('membersTableBody');
-    const pagination = document.getElementById('pagination');
     const nameSelect = document.getElementById('name');
     const sideSelect = document.getElementById('side');
-    const pageSize = 15;
-    let currentPage = 1;
+    const categorySelect = document.getElementById('category');
 
     // Function to fetch and display names from scrape_data
     async function loadNames() {
@@ -31,13 +29,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Function to fetch and display current members
-    async function loadMembers(page = 1) {
+    async function loadMembers() {
         try {
-            const response = await fetch(`/api/current_members?page=${page}&size=${pageSize}`);
+            const response = await fetch('/api/current_members');
             if (!response.ok) throw new Error('Failed to fetch members');
             const data = await response.json();
             updateTable(data.members);
-            updatePagination(data.total_pages, page);
         } catch (error) {
             console.error('Error loading members:', error);
         }
@@ -58,12 +55,21 @@ document.addEventListener('DOMContentLoaded', function() {
                             <option value="Left" ${member.side === 'Left' ? 'selected' : ''}>左</option>
                             <option value="Right" ${member.side === 'Right' ? 'selected' : ''}>右</option>
                             <option value="none" ${member.side === 'none' ? 'selected' : ''}>未定</option>
-                          </select>`
+                        </select>`
                         : member.side
                     }
                 </td>
                 <td>${member.weight}</td>
-                <td>${member.category}</td>
+                <td>
+                    ${member.isEditing
+                        ? `<select class="form-select">
+                            <option value="One" ${member.category === 'One' ? 'selected' : ''}>1隊</option>
+                            <option value="Two" ${member.category === 'Two' ? 'selected' : ''}>2隊</option>
+                            <option value="none" ${member.category === 'none' ? 'selected' : ''}>未定</option>
+                        </select>`
+                        : member.category === 'One' ? '1隊' : member.category === 'Two' ? '2隊' : '未定'
+                    }
+                </td>
                 <td>
                     <button class="btn btn-warning btn-sm" onclick="editMember(this)">Edit</button>
                     <button class="btn btn-danger btn-sm" onclick="deleteMember('${member.name}')">Delete</button>
@@ -71,21 +77,6 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             membersTableBody.appendChild(row);
         });
-    }
-
-    // Function to update pagination controls
-    function updatePagination(totalPages, currentPage) {
-        pagination.innerHTML = ''; // Clear existing pagination
-        for (let page = 1; page <= totalPages; page++) {
-            const pageItem = document.createElement('li');
-            pageItem.className = `page-item ${page === currentPage ? 'active' : ''}`;
-            pageItem.innerHTML = `<a class="page-link" href="#">${page}</a>`;
-            pageItem.addEventListener('click', function(event) {
-                event.preventDefault();
-                loadMembers(page);
-            });
-            pagination.appendChild(pageItem);
-        }
     }
 
     // Function to handle form submission
@@ -107,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             if (!response.ok) throw new Error('Failed to add member');
             alert('Member added successfully');
-            loadMembers(currentPage); // Refresh the list
+            loadMembers(); // Refresh the list
             loadNames(); // Refresh the name dropdown
         } catch (error) {
             console.error('Error adding member:', error);
@@ -120,35 +111,45 @@ document.addEventListener('DOMContentLoaded', function() {
         const row = button.closest('tr');
         const name = row.dataset.name;
         const isEditing = button.textContent === 'Edit';
-    
+        
         if (isEditing) {
             // Enter editing mode
             button.textContent = 'Save';
             button.className = 'btn btn-success btn-sm'; // Change button class to success
             row.querySelectorAll('td').forEach((td, index) => {
                 if (index === 2) { // Side column
+                    const side = td.textContent.trim();
                     td.innerHTML = `
                         <select class="form-select">
-                            <option value="Left" ${td.textContent === 'Left' ? 'selected' : ''}>左</option>
-                            <option value="Right" ${td.textContent === 'Right' ? 'selected' : ''}>右</option>
-                            <option value="none" ${td.textContent === 'none' ? 'selected' : ''}>未定</option>
+                            <option value="Left" ${side === 'Left' ? 'selected' : ''}>左</option>
+                            <option value="Right" ${side === 'Right' ? 'selected' : ''}>右</option>
+                            <option value="none" ${side === 'none' ? 'selected' : ''}>未定</option>
+                        </select>
+                    `;
+                } else if (index === 4) { // Category column
+                    const category = td.textContent.trim();
+                    td.innerHTML = `
+                        <select class="form-select">
+                            <option value="One" ${category === '1隊' ? 'selected' : ''}>1隊</option>
+                            <option value="Two" ${category === '2隊' ? 'selected' : ''}>2隊</option>
+                            <option value="none" ${category === '未定' ? 'selected' : ''}>未定</option>
                         </select>
                     `;
                 }
             });
         } else {
             // Save changes
-            const side = row.querySelector('select').value;
-            const weight = parseFloat(row.querySelector('td:nth-child(3)').textContent);
-            const category = row.querySelector('td:nth-child(4)').textContent;
-    
+            const side = row.querySelector('td:nth-child(3) select').value;
+            const category = row.querySelector('td:nth-child(5) select').value;
+            const weight = parseFloat(row.querySelector('td:nth-child(4)').textContent.trim()); // Adjusted for weight
+
             const updatedMember = {
                 name,
                 side,
                 weight,
                 category
             };
-    
+        
             fetch(`/api/update_members`, {
                 method: 'POST',
                 headers: {
@@ -186,5 +187,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initial load
     loadNames();
-    loadMembers(currentPage);
+    loadMembers();
 });

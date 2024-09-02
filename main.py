@@ -71,42 +71,46 @@ async def get_attendance():
 
 @app.post("/api/update_members")
 async def update_members(members: List[Member]):
-    conn = sqlite3.connect('mydatabase.db')
-    cursor = conn.cursor()
-    
-    for member in members:
-        cursor.execute("UPDATE members SET side = ?, weight = ?, category = ? WHERE name = ?", (member.side, member.weight, member.category, member.name))
-    
-    conn.commit()
-    conn.close()
-    return {"message": "Members updated"}
+    try:
+        conn = sqlite3.connect('mydatabase.db')
+        cursor = conn.cursor()
+
+        for member in members:
+            cursor.execute(
+                "UPDATE members SET side = ?, weight = ?, category = ? WHERE name = ?",
+                (member.side, member.weight, member.category, member.name)
+            )
+
+        conn.commit()
+        conn.close()
+        return {"message": "Members updated successfully"}
+    except sqlite3.Error as e:
+        logger.error(f"Failed to update members: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to update members")
+
 
 @app.get("/api/current_members")
-async def get_members(page: int = Query(1, ge=1), size: int = Query(15, ge=1)):
-    start_index = (page - 1) * size
-    end_index = start_index + size
+async def get_members():
+    try:
+        conn = sqlite3.connect('mydatabase.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM members")
+        rows = cursor.fetchall()
+        conn.close()
 
-    conn = sqlite3.connect('mydatabase.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT COUNT(*) FROM members")
-    total_records = cursor.fetchone()[0]
-    total_pages = (total_records + size - 1) // size  # 取整數的頁數
-
-    cursor.execute("SELECT * FROM members LIMIT ? OFFSET ?", (size, start_index))
-    rows = cursor.fetchall()
-    conn.close()
-
-    members = [{
-        "name": row[0],
-        "side": row[1],
-        "weight": row[2],
-        "category": row[3]
-    } for row in rows]
-    
-    return {
-        "members": members,
-        "total_pages": total_pages
-    }
+        members = [{
+            "name": row[0],
+            "side": row[1],
+            "weight": row[2],
+            "category": row[3]
+        } for row in rows]
+        
+        return {
+            "members": members
+        }
+    except sqlite3.Error as e:
+        logger.error(f"Failed to retrieve members: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to retrieve members")
 
 @app.delete("/api/delete_member")
 async def delete_member(name: str):

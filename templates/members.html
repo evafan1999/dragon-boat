@@ -39,7 +39,11 @@
             
             <div class="col-auto">
                 <label for="category">Category:</label>
-                <input class="form-control" type="text" id="category" placeholder="Category" required>
+                <select id="category" name="category" class="form-control" required>
+                    <option value="One">1隊</option>
+                    <option value="Two">2隊</option>
+                    <option value="none">None</option>
+                </select>
             </div>
             
             <div class="col-auto">
@@ -63,12 +67,6 @@
                 <!-- Members will be populated here -->
             </tbody>
         </table>
-        
-        <nav aria-label="Page navigation">
-            <ul id="pagination" class="pagination">
-                <!-- Pagination will be populated here -->
-            </ul>
-        </nav>
         <button class="btn" style="background-color: #33312E; color: #E0E2DB;" onclick="window.location.href='/'">返回出席表</button>
     </div>
 
