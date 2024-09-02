@@ -84,8 +84,11 @@
                 </div>
             </div>
         </div>
-        <h4 class="mt-4">今日出席人員</h4>
-        <div id="attendanceList" class="mt-3"></div>
+        <div>
+            <h4 class="mt-4">今日出席人員</h4>
+            <div id="attendanceList" class="mt-3"></div>
+            <button onclick="exportTableToImage('attendanceList')" class="btn" style="background-color: #D2D4C8; color: #33312e;">匯出出席表</button>
+        </div>
         <div id="loading" class="loading-overlay">Loading...</div>
     </div>
     <div class="container mt-4">
