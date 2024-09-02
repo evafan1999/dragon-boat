@@ -25,7 +25,7 @@ class Member(BaseModel):
 
 # 爬取數據
 def scrape_data():
-    url = "https://densuke.biz/list?cd=pA9QsVcW7K9MnnY7"
+    url = "https://densuke.biz/list?cd=a23SSfHZzRCeKetW"
     response = requests.get(url)
 
     if response.status_code == 200:
