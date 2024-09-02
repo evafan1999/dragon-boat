@@ -25,7 +25,6 @@ class Member(BaseModel):
 
 # 爬取數據
 def scrape_data():
-    # url = "https://densuke.biz/list?cd=zmeRuJKrVJvpQUJn#google_vignette" 五六月
     url = "https://densuke.biz/list?cd=pA9QsVcW7K9MnnY7"
     response = requests.get(url)
 
@@ -50,7 +49,7 @@ def scrape_data():
 # 設置 CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 可以設置具體的允許來源
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -71,64 +70,52 @@ async def get_attendance():
     return data
 
 @app.post("/api/update_members")
-async def update_members(member_list: List[Member]):
-    try:
-        with sqlite3.connect('mydatabase.db') as conn:
-            cursor = conn.cursor()
-            cursor.execute('''CREATE TABLE IF NOT EXISTS members
-                            (name TEXT, side TEXT, weight REAL, category TEXT)''')
-            
-            existing_members = {row[0] for row in cursor.execute("SELECT name FROM members")}
-            new_members = [member for member in member_list if member.name not in existing_members]
-            
-            for member in member_list:
-                if member.name in existing_members:
-                    cursor.execute("UPDATE members SET side=?, weight=?, category=? WHERE name=?",
-                                   (member.side, member.weight, member.category, member.name))
-                else:
-                    cursor.executemany("INSERT INTO members (name, side, weight, category) VALUES (?, ?, ?, ?)",
-                                       [(m.name, m.side, m.weight, m.category) for m in new_members])
-
-            conn.commit()
-        return {"message": "Member list updated successfully"}
-    except Exception as e:
-        logger.error(f"Failed to update member list: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to update member list: {str(e)}")
+async def update_members(members: List[Member]):
+    conn = sqlite3.connect('mydatabase.db')
+    cursor = conn.cursor()
+    
+    for member in members:
+        cursor.execute("UPDATE members SET side = ?, weight = ?, category = ? WHERE name = ?", (member.side, member.weight, member.category, member.name))
+    
+    conn.commit()
+    conn.close()
+    return {"message": "Members updated"}
 
 @app.get("/api/current_members")
-async def get_current_members(page: int = Query(1, ge=1), size: int = Query(15, ge=1)):
-    try:
-        offset = (page - 1) * size
-        with sqlite3.connect('mydatabase.db') as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT name, side, weight, category FROM members LIMIT ? OFFSET ?", (size, offset))
-            members = [{"name": row[0], "side": row[1], "weight": row[2], "category": row[3]} for row in cursor.fetchall()]
+async def get_members(page: int = Query(1, ge=1), size: int = Query(15, ge=1)):
+    start_index = (page - 1) * size
+    end_index = start_index + size
 
-            cursor.execute("SELECT COUNT(*) FROM members")
-            total_count = cursor.fetchone()[0]
+    conn = sqlite3.connect('mydatabase.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM members")
+    total_records = cursor.fetchone()[0]
+    total_pages = (total_records + size - 1) // size  # 取整數的頁數
 
-        total_pages = (total_count + size - 1) // size  # 計算總頁數
-        return {
-            "members": members,
-            "total_pages": total_pages,
-            "current_page": page,
-            "page_size": size
-        }
-    except Exception as e:
-        logger.error(f"Failed to retrieve current members: {str(e)}")
-        return {"error": f"Failed to retrieve current members: {str(e)}"}
+    cursor.execute("SELECT * FROM members LIMIT ? OFFSET ?", (size, start_index))
+    rows = cursor.fetchall()
+    conn.close()
+
+    members = [{
+        "name": row[0],
+        "side": row[1],
+        "weight": row[2],
+        "category": row[3]
+    } for row in rows]
+    
+    return {
+        "members": members,
+        "total_pages": total_pages
+    }
 
 @app.delete("/api/delete_member")
 async def delete_member(name: str):
-    try:
-        with sqlite3.connect('mydatabase.db') as conn:
-            cursor = conn.cursor()
-            cursor.execute("DELETE FROM members WHERE name=?", (name,))
-            conn.commit()
-        return {"message": f"Member '{name}' deleted successfully"}
-    except Exception as e:
-        logger.error(f"Failed to delete member '{name}': {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to delete member '{name}': {str(e)}")
+    conn = sqlite3.connect('mydatabase.db')
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM members WHERE name = ?", (name,))
+    conn.commit()
+    conn.close()
+    return {"message": "Member deleted"}
 
 @app.delete("/api/clear_database")
 async def clear_database():
@@ -144,16 +131,36 @@ async def clear_database():
     
 @app.post("/api/add_member")
 async def add_member(member: Member):
+    conn = sqlite3.connect('mydatabase.db')
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO members (name, side, weight, category) VALUES (?, ?, ?, ?)", (member.name, member.side, member.weight, member.category))
+    conn.commit()
+    conn.close()
+    return {"message": "Member added"}
+
+@app.get("/scrape")
+async def scrape():
+    scrape_data()
+    return {"message": "Scraping completed"}
+
+@app.get("/api/available_names")
+async def get_available_names():
     try:
+        # 爬取數據
+        data = scrape_data()
+        all_names = set(data['names'])  # 所有可選名字
+        if not all_names:
+            return {"error": "No names available"}
+
+        # 查詢現有成員
         with sqlite3.connect('mydatabase.db') as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM members WHERE name=?", (member.name,))
-            if cursor.fetchone():
-                raise HTTPException(status_code=400, detail="Member already exists")
-            cursor.execute("INSERT INTO members (name, side, weight, category) VALUES (?, ?, ?, ?)",
-                           (member.name, member.side, member.weight, member.category))
-            conn.commit()
-        return {"message": "New member added successfully"}
+            cursor.execute("SELECT name FROM members")
+            existing_members = {row[0] for row in cursor.fetchall()}
+
+        # 找出尚未新增的名字
+        available_names = list(all_names - existing_members)
+        return available_names
     except Exception as e:
-        logger.error(f"Failed to add new member: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to add new member: {str(e)}")
+        logger.error(f"Failed to retrieve available names: {str(e)}")
+        return {"error": f"Failed to retrieve available names: {str(e)}"}
