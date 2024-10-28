@@ -102,7 +102,7 @@ async function getAttendance() {
 
 
         populateSpecialOptions('left_0', 'right_0', allPresentMembers, allAbsentMembers);
-        for (let i = 1; i <= 12; i++) {
+        for (let i = 1; i <= 8; i++) {
             populateOptions('left_' + i, 'right_' + i, allPresentMembers, allAbsentMembers);
         }
         populateHelmsmanOptions('left_helmsman', allPresentMembers, allAbsentMembers);
@@ -277,7 +277,7 @@ function saveState(date) {
         helmsman: {}
     };
     
-    for (let i = 0; i <= 12; i++) {
+    for (let i = 0; i <= 8; i++) {
         const leftSelect = document.getElementById(`left_${i}`);
         const rightSelect = document.getElementById(`right_${i}`);
 
@@ -303,7 +303,7 @@ function saveState(date) {
 function loadState(date) {
     const state = JSON.parse(localStorage.getItem(date));
     if (!state) return;
-    for (let i = 0; i <= 12; i++) {
+    for (let i = 0; i <= 8; i++) {
         const leftSelect = document.getElementById(`left_${i}`);
         const rightSelect = document.getElementById(`right_${i}`);
 
@@ -371,11 +371,6 @@ async function updateAvailableNames() {
     }
 }
 
-// 事件監聽器：添加成員按鈕
-document.getElementById('addMemberButton').addEventListener('click', async () => {
-    await addMember(); // 假設這裡有方法來添加成員到後端
-    await updateAvailableNames(); // 更新可用成員名單
-});
 
 // 新增方法：更新選單選項
 function updateSelectOptions(names) {
