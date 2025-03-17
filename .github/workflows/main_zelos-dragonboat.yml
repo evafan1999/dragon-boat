@@ -76,3 +76,4 @@ jobs:
         with:
           app-name: 'zelos-dragonboat'  # Azure App Service 名稱
           package: '.'  # 部署目前解壓縮的目錄
+
