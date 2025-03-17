@@ -15,7 +15,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout respository
+        uses: actions/checkout@v4
 
       - name: Set up Python version
         uses: actions/setup-python@v4
@@ -26,6 +27,11 @@ jobs:
         run: |
           python -m venv venv
           source venv/bin/activate
+
+      - name: Install ODBC dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unixodbc-dev  
       
       - name: Install dependencies
         run: pip install -r requirements.txt
