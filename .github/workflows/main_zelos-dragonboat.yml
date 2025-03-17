@@ -8,7 +8,6 @@ on:
   push:
     branches:
       - main
-  # workflow_dispatch: # 手動觸發部署（如果需要）
 
 jobs:
   build:
@@ -35,10 +34,6 @@ jobs:
       
       - name: Install dependencies
         run: pip install -r requirements.txt
-        
-      # 可選：可以在這裡加入測試步驟，例如 pytest
-      # - name: Run tests
-      #   run: pytest
 
       - name: Zip artifact for deployment
         run: zip -r release.zip ./* -x "venv/*"
@@ -56,7 +51,7 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write # 這是 OIDC 身份驗證所需的
+      id-token: write  # OIDC 登入所需權限
 
     steps:
       - name: Download artifact from build job
@@ -72,6 +67,7 @@ jobs:
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           allow-no-subscriptions: true
           
       - name: Deploy to Azure Web App
