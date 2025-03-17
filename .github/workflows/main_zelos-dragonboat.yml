@@ -22,11 +22,6 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Create and start virtual environment
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-
       - name: Install ODBC dependencies
         run: |
           sudo apt-get update
