@@ -68,12 +68,15 @@ jobs:
 
       
       - name: Login to Azure
-        uses: azure/login@v2
+        uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_79979A425661482E882E412C43B33FC8 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B4D2FB4B30A9494CA9E483AE4922FAA3 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_EB1E54F60EDB4B5F89909CFD805065CE }}
-          enable-AzPSSession: true
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+
+      - name: Deploy to Azure
+        run: |
+          az webapp list
 
       - name: Azure CLI script
         uses: azure/cli@v2
